@@ -1,0 +1,19 @@
+{
+    "name": "textmeshpro-tool",
+    "version": "1.0.0",
+    "description": "textmeshpro sdf字体打包工具",
+    "author": "Yip",
+    "main": "main.js",
+    "main-menu": {
+        "i18n:MAIN_MENU.package.title/TextMeshPro": {
+            "message": "textmeshpro-tool:openPanel"
+        }
+    },
+    "panel": {
+        "main": "panel/index.js",
+        "type": "dockable",
+        "title": "TextMeshPro Tool",
+        "width": 700,
+        "height": 300
+    }
+}
