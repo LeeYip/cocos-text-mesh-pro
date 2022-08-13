@@ -1,11 +1,14 @@
 "use strict";
 
 const { dialog } = require("electron");
+const os = require("os");
 const fs = require("fs");
 const exec = require("child_process").exec;
 const utils = require("./utils");
 
+const EXAMPLE_PATH = "/packages/textmeshpro-tool/textMeshPro";
 const CONFIG_PATH = "/packages/textmeshpro-tool/config.json";
+const TEMP_PATH = "/extensions/textmeshpro-tool/dist/temp";
 const TEMP_HIERO_PATH = "/packages/textmeshpro-tool/temp/hieroConfig.hiero";
 
 let config = {
@@ -63,6 +66,10 @@ function writeConfig() {
 
 function exportFont() {
     try {
+        let check = fs.existsSync(`${Editor.Project.path}${TEMP_PATH}`);
+        if (!check) {
+            fs.mkdirSync(`${Editor.Project.path}${TEMP_PATH}`);
+        }
         utils.writeHiero(`${Editor.Project.path}${TEMP_HIERO_PATH}`, config);
         let cmdStr = `${config.hieroPath} -i ${Editor.Project.path}${TEMP_HIERO_PATH} -o ${config.exportDir}/${config.exportName}.fnt -b`;
 
@@ -94,12 +101,46 @@ module.exports = {
     },
 
     messages: {
+        importExample() {
+            try {
+                let check = fs.existsSync(`${Editor.Project.path}/assets/textMeshPro`);
+                if (check) {
+                    dialog.showMessageBox({
+                        type: "warning",
+                        title: "warning",
+                        message: "警告",
+                        detail: "assets目录下已存在textMeshPro文件夹，为防止误覆盖，请手动导入",
+                        buttons: ["确定"],
+                    }).then(res => console.log(res));
+                    return;
+                }
+
+                let cmdStr = "";
+                if (os.type() == "Windows_NT") {
+                    cmdStr = `xcopy ${Editor.Project.path}${EXAMPLE_PATH.replace(/\//g, "\\")} ${Editor.Project.path}\\assets\\textMeshPro\\ /e`;
+                } else {
+                    cmdStr = `cp -r ${Editor.Project.path}${EXAMPLE_PATH} ${Editor.Project.path}/assets/textMeshPro/`;
+                }
+                Editor.log(cmdStr);
+                exec(cmdStr, (error, stdout, stderr) => {
+                    if (error) {
+                        Editor.error(`[textmeshpro-tool importExample] exec error: ${error}`);
+                        return;
+                    }
+                    Editor.assetdb.refresh("db://assets/textMeshPro/");
+                });
+            } catch (error) {
+                Editor.error(`[textmeshpro-tool importExample] 文件导入失败，请尝试手动导入 error: ${error}`);
+                Editor.error(error);
+            }
+        },
+
         openPanel() {
             Editor.Panel.open("textmeshpro-tool");
         },
 
         onPanelInit() {
-            Editor.Ipc.sendToPanel("textmeshpro-tool", "refresh-config", config);
+            Editor.Ipc.sendToPanel("textmeshpro-tool", "refreshConfig", config);
         },
 
         onChangeConfig(event, key, value) {
@@ -113,7 +154,7 @@ module.exports = {
             }).then((res) => {
                 if (res.filePaths.length > 0) {
                     config.exportDir = res.filePaths[0];
-                    Editor.Ipc.sendToPanel("textmeshpro-tool", "refresh-config", config);
+                    Editor.Ipc.sendToPanel("textmeshpro-tool", "refreshConfig", config);
                 }
             });
         },
@@ -128,7 +169,7 @@ module.exports = {
             }).then((res) => {
                 if (res.filePaths.length > 0) {
                     config.fontPath = res.filePaths[0];
-                    Editor.Ipc.sendToPanel("textmeshpro-tool", "refresh-config", config);
+                    Editor.Ipc.sendToPanel("textmeshpro-tool", "refreshConfig", config);
                 }
             });
         },
@@ -143,7 +184,7 @@ module.exports = {
             }).then((res) => {
                 if (res.filePaths.length > 0) {
                     config.hieroPath = res.filePaths[0];
-                    Editor.Ipc.sendToPanel("textmeshpro-tool", "refresh-config", config);
+                    Editor.Ipc.sendToPanel("textmeshpro-tool", "refreshConfig", config);
                 }
             });
         },
@@ -158,7 +199,7 @@ module.exports = {
             }).then((res) => {
                 if (res.filePaths.length > 0) {
                     config.textPath = res.filePaths[0];
-                    Editor.Ipc.sendToPanel("textmeshpro-tool", "refresh-config", config);
+                    Editor.Ipc.sendToPanel("textmeshpro-tool", "refreshConfig", config);
                 }
             });
         },

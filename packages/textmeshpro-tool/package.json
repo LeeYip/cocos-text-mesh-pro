@@ -5,8 +5,11 @@
     "author": "Yip",
     "main": "main.js",
     "main-menu": {
-        "i18n:MAIN_MENU.package.title/TextMeshPro": {
+        "i18n:MAIN_MENU.package.title/TextMeshPro/Tool": {
             "message": "textmeshpro-tool:openPanel"
+        },
+        "i18n:MAIN_MENU.package.title/TextMeshPro/Import": {
+            "message": "textmeshpro-tool:importExample"
         }
     },
     "panel": {
@@ -14,6 +17,6 @@
         "type": "dockable",
         "title": "TextMeshPro Tool",
         "width": 700,
-        "height": 300
+        "height": 350
     }
 }

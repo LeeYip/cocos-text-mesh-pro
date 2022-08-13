@@ -81,8 +81,8 @@ Editor.Panel.extend({
                     </ui-select>
                 </ui-prop>
                 <ui-prop id="textStr" name="输入框" type="string" value="" multiline auto-height class="flex-1" tabindex="1"></ui-prop>
-                <ui-prop  id="textPathElement" name="文本文件" class="flex-1" tabindex="1">
-                    <ui-input id="textPath" placeholder="export path..." class="flex-2" tabindex="2"></ui-input>
+                <ui-prop id="textPathElement" name="文本文件" class="flex-1" tabindex="1">
+                    <ui-input id="textPath" placeholder="txt path..." class="flex-2" tabindex="2"></ui-input>
                     <ui-button id="btnTextPath" class="tiny" tabindex="-1">...</ui-button>
                 </ui-prop>
 
@@ -104,16 +104,16 @@ Editor.Panel.extend({
     `,
 
     $: {
-        exportName: "#exportName",
-        exportDir: "#exportDir",
-        btnExportDir: "#btnExportDir",
+        hieroPath: "#hieroPath",
+        btnHiero: "#btnHiero",
+        btnDownload: "#btnDownload",
 
         fontPath: "#fontPath",
         btnFontPath: "#btnFontPath",
 
-        hieroPath: "#hieroPath",
-        btnHiero: "#btnHiero",
-        btnDownload: "#btnDownload",
+        exportName: "#exportName",
+        exportDir: "#exportDir",
+        btnExportDir: "#btnExportDir",
 
         textSelect: "#textSelect",
         textStr: "#textStr",
@@ -160,7 +160,7 @@ Editor.Panel.extend({
             Editor.Ipc.sendToMain("textmeshpro-tool:onChangeConfig", "textFrom", Number(this.$textSelect.value));
         });
         this.$textStr.addEventListener("confirm", () => {
-            Editor.Ipc.sendToMain("textmeshpro-tool:onChangeConfig", "text", this.$textStr.value);
+            Editor.Ipc.sendToMain("textmeshpro-tool:onChangeConfig", "textStr", this.$textStr.value);
         });
         this.$btnTextPath.addEventListener("confirm", () => {
             Editor.Ipc.sendToMain("textmeshpro-tool:onClickBtnTextPath");
@@ -217,7 +217,7 @@ Editor.Panel.extend({
     },
 
     messages: {
-        "refresh-config"(event, arg) {
+        refreshConfig(event, arg) {
             config = arg;
             this.$exportName.value = config.exportName;
             this.$exportDir.value = config.exportDir;
