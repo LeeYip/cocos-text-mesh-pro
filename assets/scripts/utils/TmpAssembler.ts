@@ -239,12 +239,12 @@ export default class TmpAssembler extends cc.Assembler {
             _isWrapText = false;
             _contentSize.width += shareLabelInfo.margin * 2;
             _contentSize.height += shareLabelInfo.margin * 2;
-        }
-        else if (_overflow === TmpOverflow.RESIZE_HEIGHT) {
+        } else if (_overflow === TmpOverflow.RESIZE_HEIGHT) {
             _isWrapText = true;
             _contentSize.height += shareLabelInfo.margin * 2;
-        }
-        else {
+        } else if (_overflow === TmpOverflow.SHRINK) {
+            _isWrapText = false;
+        } else {
             _isWrapText = comp.enableWrapText;
         }
 
@@ -1111,7 +1111,7 @@ export default class TmpAssembler extends cc.Assembler {
         let tmpColor = cc.color();
         for (let i = 0; i < this._lettersInfo.length; i++) {
             let info = this._lettersInfo[i];
-            if (!info.valid) {
+            if (!info.valid || cc.textUtils.isUnicodeSpace(info.char)) {
                 continue;
             }
             let alpha = info.visible ? 1 : 0;
@@ -1156,7 +1156,7 @@ export default class TmpAssembler extends cc.Assembler {
      */
     public setVisible(comp: TextMeshPro, index: number, visible: boolean): void {
         let info = this._lettersInfo[index];
-        if (!info || this.isVisble(index) === visible || info.visible === visible) {
+        if (!info || this.isVisble(index) === visible || info.visible === visible || cc.textUtils.isUnicodeSpace(info.char)) {
             return;
         }
 
@@ -1216,7 +1216,7 @@ export default class TmpAssembler extends cc.Assembler {
      */
     public setColorExtraVertices(index: number, data: [cc.Color, cc.Color, cc.Color, cc.Color]): void {
         let info = this._lettersInfo[index];
-        if (!info || !info.valid || data.length !== 4) {
+        if (!info || !info.valid || data.length !== 4 || cc.textUtils.isUnicodeSpace(info.char)) {
             return;
         }
 
@@ -1251,7 +1251,7 @@ export default class TmpAssembler extends cc.Assembler {
      */
     public setPosVertices(index: number, data: [cc.Vec2, cc.Vec2, cc.Vec2, cc.Vec2]): void {
         let info = this._lettersInfo[index];
-        if (!info || !info.valid || data.length !== 4) {
+        if (!info || !info.valid || data.length !== 4 || cc.textUtils.isUnicodeSpace(info.char)) {
             return;
         }
         let local = this._local;

@@ -1,6 +1,6 @@
-import EditorTool from "./utils/EditorTool";
 import TmpAssembler from "./utils/TmpAssembler";
 import TmpFontConfig from "./utils/TmpFontConfig";
+import TmpUtils from "./utils/TmpUtils";
 
 const { ccclass, property, executeInEditMode } = cc._decorator;
 
@@ -482,18 +482,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     @property({ tooltip: CC_DEV && "材质参数", type: TmpUniform })
     public tmpUniform: TmpUniform = new TmpUniform();
 
-    @property
-    private _showTextures: boolean = false;
-    @property({ tooltip: CC_DEV && "是否显示BitmapFont字体依赖的纹理" })
-    private get showTextures(): boolean { return this._showTextures; }
-    private set showTextures(v: boolean) {
-        if (this._showTextures === v) {
-            return;
-        }
-        this._showTextures = v;
-    }
-
-    @property({ type: cc.Texture2D, readonly: true, visible() { return this._showTextures; } })
+    @property({ tooltip: CC_DEV && "字体所依赖的纹理", type: cc.Texture2D, readonly: true })
     public textures: cc.Texture2D[] = [];
 
     private _fontConfig: TmpFontConfig = null;
@@ -524,7 +513,7 @@ export default class TextMeshPro extends cc.RenderComponent {
                 let arr: Promise<cc.Texture2D>[] = [];
                 this._font.json.pageData.forEach((v) => {
                     let imgUrl = dir + v.file;
-                    arr.push(EditorTool.load<cc.Texture2D>(imgUrl));
+                    arr.push(TmpUtils.load<cc.Texture2D>(imgUrl));
                 });
                 Promise.all(arr).then((v) => {
                     this.textures = v;
@@ -541,7 +530,7 @@ export default class TextMeshPro extends cc.RenderComponent {
 
     protected resetInEditor(): void {
         if (CC_EDITOR) {
-            EditorTool.load<cc.Material>("resources/shader/materials/textMeshPro.mtl").then((mat) => {
+            TmpUtils.load<cc.Material>("resources/shader/materials/textMeshPro.mtl").then((mat) => {
                 if (mat) {
                     this.setMaterial(0, mat);
                 }

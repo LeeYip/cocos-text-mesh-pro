@@ -1,7 +1,4 @@
-/**
- * 编辑器工具类
- */
-export default class EditorTool {
+export default class TmpUtils {
     /**
      * 编辑器模式下加载资源
      * @param url db://assets/
