@@ -1,0 +1,264 @@
+CCEffect %{
+  techniques:
+  - passes:
+    - vert: tmp-vs:vert
+      frag: tmp-fs:frag
+      depthStencilState:
+        depthTest: false
+        depthWrite: false
+      blendState:
+        targets:
+        - blend: true
+          blendSrc: src_alpha
+          blendDst: one_minus_src_alpha
+          blendDstAlpha: one_minus_src_alpha
+      rasterizerState:
+        cullMode: none
+      properties:
+        alphaThreshold: { value: 0.5 }
+
+        texture0: { value: white }
+        texture1: { value: white }
+        texture2: { value: white }
+        texture3: { value: white }
+        texture4: { value: white }
+        texture5: { value: white }
+        texture6: { value: white }
+        texture7: { value: white }
+
+        faceColor: { value: [1, 1, 1, 1],  editor: { type: color } }
+        faceDilate: { value: 0.5, range:[0, 1, 0.01] }
+        faceSoftness: { value: 0.02, range:[0, 1, 0.01] }
+
+        outlineColor: { value: [1, 0, 0, 1],  editor: { type: color } }
+        outlineThickness: { value: 0.1, range:[0, 1, 0.01]}
+
+        underlayColor: { value: [0, 0, 0, 1],  editor: { type: color } }
+        underlayOffsetX: { value: 0, range:[-1, 1, 0.001] }
+        underlayOffsetY: { value: 0, range:[-1, 1, 0.001] }
+        underlayDilate: { value: 0.5, range:[0, 1, 0.01] }
+        underlaySoftness: { value: 0.1, range:[0, 1, 0.01] }
+
+        glowColor: { value: [0, 1, 0, 1],  editor: { type: color } }
+        glowOffset: { value: 0.5, range:[0, 1, 0.01] }
+        glowInner: { value: 0.01, range:[0, 1, 0.01] }
+        glowOuter: { value: 0.01, range:[0, 1, 0.01] }
+        glowPower: { value: 1, range:[0, 1, 0.01] }
+}%
+
+CCProgram tmp-vs %{
+  precision highp float;
+  #include <builtin/uniforms/cc-global>
+  #if USE_LOCAL
+    #include <builtin/uniforms/cc-local>
+  #endif
+  #if SAMPLE_FROM_RT
+    #include <common/common-define>
+  #endif
+  in vec3 a_position;
+  in vec2 a_texCoord;
+  in vec4 a_color;
+  in vec4 a_color2;
+  in float a_texture_idx;
+
+  out vec4 color;
+  out vec2 uv0;
+  out float texture_idx;
+
+  vec4 vert () {
+    vec4 pos = vec4(a_position, 1);
+
+    #if USE_LOCAL
+      pos = cc_matWorld * pos;
+    #endif
+
+    #if USE_PIXEL_ALIGNMENT
+      pos = cc_matView * pos;
+      pos.xyz = floor(pos.xyz);
+      pos = cc_matProj * pos;
+    #else
+      pos = cc_matViewProj * pos;
+    #endif
+
+    uv0 = a_texCoord;
+    #if SAMPLE_FROM_RT
+      CC_HANDLE_RT_SAMPLE_FLIP(uv0);
+    #endif
+    color = a_color * a_color2;
+    texture_idx = a_texture_idx;
+
+    return pos;
+  }
+}%
+
+CCProgram tmp-fs %{
+  precision highp float;
+  #include <builtin/internal/embedded-alpha>
+  #include <builtin/internal/alpha-test>
+
+  in vec4 color;
+  in vec2 uv0;
+  in float texture_idx;
+
+  #if USE_TEXTURE_LEVEL_1
+    uniform sampler2D texture0;
+  #endif
+  #if USE_TEXTURE_LEVEL_2
+    uniform sampler2D texture1;
+  #endif
+  #if USE_TEXTURE_LEVEL_3
+    uniform sampler2D texture2;
+    uniform sampler2D texture3;
+  #endif
+  #if USE_TEXTURE_LEVEL_4
+    uniform sampler2D texture4;
+    uniform sampler2D texture5;
+    uniform sampler2D texture6;
+    uniform sampler2D texture7;
+  #endif
+
+  uniform Face {
+    // 字体颜色，会与顶点颜色进行混合
+    vec4 faceColor;
+    // 字体的粗细 0.5为字体标准粗细
+    float faceDilate;
+    // 字体的柔软度
+    float faceSoftness;
+  };
+
+  #if USE_OUTLINE
+    uniform Outline {
+      // 描边颜色，会受顶点alpha值影响
+      vec4 outlineColor;
+      // 描边粗细
+      float outlineThickness;
+    };
+  #endif
+
+  #if USE_UNDERLAY
+    uniform Underlay {
+      // 阴影颜色，会受顶点alpha值影响
+      vec4 underlayColor;
+      // 阴影偏移
+      float underlayOffsetX;
+      float underlayOffsetY;
+      // 阴影粗细
+      float underlayDilate;
+      // 阴影柔软度
+      float underlaySoftness;
+    };
+  #endif
+
+  #if USE_GLOW
+    uniform Glow {
+      // 辉光颜色，会受顶点alpha值影响
+      vec4 glowColor;
+      // 辉光偏移
+      float glowOffset;
+      // 辉光向内部的粗细
+      float glowInner;
+      // 辉光向外部的粗细
+      float glowOuter;
+      // 辉光强度 值为1时辉光强度最大，值越小辉光衰减系数越大
+      float glowPower;
+    };
+  #endif
+
+  vec4 frag () {
+    float curDistance = 0.0;
+
+    #if USE_UNDERLAY
+      float underlayDistance = 0.0;
+    #endif
+
+    #if USE_TEXTURE_LEVEL_1
+      if (texture_idx <= 0.0) {
+        curDistance = CCSampleWithAlphaSeparated(texture0, uv0).a;
+        #if USE_UNDERLAY
+          underlayDistance = CCSampleWithAlphaSeparated(texture0, uv0 + vec2(-underlayOffsetX, underlayOffsetY)).a;
+        #endif
+      }
+    #endif
+    #if USE_TEXTURE_LEVEL_2
+      else if (texture_idx <= 1.0) {
+        curDistance = CCSampleWithAlphaSeparated(texture1, uv0).a;
+        #if USE_UNDERLAY
+          underlayDistance = CCSampleWithAlphaSeparated(texture1, uv0 + vec2(-underlayOffsetX, underlayOffsetY)).a;
+        #endif
+      }
+    #endif
+    #if USE_TEXTURE_LEVEL_3
+      else if (texture_idx <= 2.0) {
+        curDistance = CCSampleWithAlphaSeparated(texture2, uv0).a;
+        #if USE_UNDERLAY
+          underlayDistance = CCSampleWithAlphaSeparated(texture2, uv0 + vec2(-underlayOffsetX, underlayOffsetY)).a;
+        #endif
+      } else if (texture_idx <= 3.0) {
+        curDistance = CCSampleWithAlphaSeparated(texture3, uv0).a;
+        #if USE_UNDERLAY
+          underlayDistance = CCSampleWithAlphaSeparated(texture3, uv0 + vec2(-underlayOffsetX, underlayOffsetY)).a;
+        #endif
+      }
+    #endif
+    #if USE_TEXTURE_LEVEL_4
+      else if (texture_idx <= 4.0) {
+        curDistance = CCSampleWithAlphaSeparated(texture4, uv0).a;
+        #if USE_UNDERLAY
+          underlayDistance = CCSampleWithAlphaSeparated(texture4, uv0 + vec2(-underlayOffsetX, underlayOffsetY)).a;
+        #endif
+      } else if (texture_idx <= 5.0) {
+        curDistance = CCSampleWithAlphaSeparated(texture5, uv0).a;
+        #if USE_UNDERLAY
+          underlayDistance = CCSampleWithAlphaSeparated(texture5, uv0 + vec2(-underlayOffsetX, underlayOffsetY)).a;
+        #endif
+      } else if (texture_idx <= 6.0) {
+        curDistance = CCSampleWithAlphaSeparated(texture6, uv0).a;
+        #if USE_UNDERLAY
+          underlayDistance = CCSampleWithAlphaSeparated(texture6, uv0 + vec2(-underlayOffsetX, underlayOffsetY)).a;
+        #endif
+      } else if (texture_idx <= 7.0) {
+        curDistance = CCSampleWithAlphaSeparated(texture7, uv0).a;
+        #if USE_UNDERLAY
+          underlayDistance = CCSampleWithAlphaSeparated(texture7, uv0 + vec2(-underlayOffsetX, underlayOffsetY)).a;
+        #endif
+      }
+    #endif
+
+    float faceValue = 1.0 - faceDilate;
+    float faceDistance = smoothstep(faceValue - faceSoftness, faceValue + faceSoftness, curDistance);
+    vec4 fragColor = vec4(color.rgb * faceColor.rgb, faceColor.a * faceDistance);
+
+    #if USE_OUTLINE
+      float outEdge1 = faceValue - outlineThickness;
+      float outEdge2 = faceValue;
+      float outlineDistance = smoothstep(outEdge1 - faceSoftness, outEdge1 + faceSoftness, curDistance) - smoothstep(outEdge2 - faceSoftness, outEdge2 + faceSoftness, curDistance);
+      float faceClip = step(0.001, faceColor.a);
+      float outClip = step(0.001, outlineColor.a);
+      fragColor.rgb = color.rgb * faceColor.rgb * faceDistance * faceClip + outlineColor.rgb * outlineDistance * outClip;
+      fragColor.a = faceColor.a * faceDistance + outlineColor.a * outlineDistance;
+    #endif
+
+    #if USE_UNDERLAY
+      float underlayValue = 1.0 - underlayDilate;
+      float underlayAlpha = smoothstep(underlayValue - underlaySoftness, underlayValue + underlaySoftness, underlayDistance);
+      vec4 finalUnderlayColor = vec4(underlayColor.rgb, underlayAlpha * underlayColor.a);
+      if (fragColor.a < 1.0 && finalUnderlayColor.a > 0.0) {
+        fragColor.rgb *= fragColor.a;
+        fragColor += finalUnderlayColor * (1.0 - fragColor.a);
+      }
+    #endif
+
+    #if USE_GLOW
+      float delta = curDistance - glowOffset;
+      float deltaFactor = step(0.0, delta);
+      float attenuation = pow(abs(delta), glowPower) * 2.0;
+      float alpha = clamp(max(glowInner - attenuation, 0.0) / glowInner, 0.0, 1.0) * deltaFactor + clamp((glowOuter - attenuation) / glowOuter, 0.0, 1.0) * (1.0 - deltaFactor);
+      fragColor += glowColor * glowColor.a * alpha;
+    #endif
+
+    fragColor.a *= color.a;
+
+    ALPHA_TEST(fragColor);
+    return fragColor;
+  }
+}%
