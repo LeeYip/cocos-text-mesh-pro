@@ -565,7 +565,7 @@ export default class TextMeshPro extends UIRenderer {
 
     public resetInEditor(): void {
         if (EDITOR) {
-            TmpUtils.load<Material>("resources/shader/materials/textMeshPro.mtl").then((mat) => {
+            TmpUtils.load<Material>("textMeshPro/resources/shader/materials/textMeshPro.mtl").then((mat) => {
                 if (mat) {
                     this.customMaterial = mat;
                 }
