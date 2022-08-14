@@ -401,6 +401,9 @@ export default class TmpAssembler extends cc.Assembler {
                 if (_overflow === TmpOverflow.ELLIPSIS && _ellipsisDef && lineIndex + 1 >= ellipsisMaxLines) {
                     this._recordEllipsis(nextTokenY, letterPosition, lineIndex);
                     useEllipsis = true;
+                    // 更新_linesWidth
+                    let ellipsisInfo = this._lettersInfo[this._lettersInfo.length - 1];
+                    letterRight = ellipsisInfo.x + _ellipsisDef.w * _bmfontScale - shareLabelInfo.margin;
                     break;
                 }
 
@@ -451,6 +454,9 @@ export default class TmpAssembler extends cc.Assembler {
                         if (!_isWrapText || lineIndex + 1 >= ellipsisMaxLines) {
                             this._recordEllipsis(nextTokenY, letterPosition, lineIndex);
                             useEllipsis = true;
+                            // 更新_linesWidth
+                            let ellipsisInfo = this._lettersInfo[this._lettersInfo.length - 1];
+                            letterRight = ellipsisInfo.x + _ellipsisDef.w * _bmfontScale - shareLabelInfo.margin;
                             break;
                         }
                     }
@@ -611,8 +617,11 @@ export default class TmpAssembler extends cc.Assembler {
         while (lastIndex >= 0) {
             let lastInfo = this._lettersInfo[lastIndex];
             let lastDef = shareLabelInfo.fontAtlas.getLetterDefinitionForChar(lastInfo.char);
-            let lastRightX = lastInfo.x + lastDef.w * _bmfontScale - shareLabelInfo.margin;
-            nextX = lastInfo.x + (lastDef.xAdvance - lastDef.offsetX) * _bmfontScale + _spacingX - shareLabelInfo.margin * 2;
+            let lastW = lastDef ? lastDef.w : 0;
+            let lastXAdvance = lastDef ? lastDef.xAdvance : 0;
+            let lastOffsetX = lastDef ? lastDef.offsetX : 0;
+            let lastRightX = lastInfo.x + lastW * _bmfontScale - shareLabelInfo.margin;
+            nextX = lastInfo.x + (lastXAdvance - lastOffsetX) * _bmfontScale + _spacingX - shareLabelInfo.margin * 2;
             if (_maxLineWidth >= lastRightX + _ellipsisWidth) {
                 break;
             }
