@@ -27,7 +27,7 @@
 - 提供顶点数据接口，可以自由实现顶点动画
 - 提供新的排版模式ELLIPSIS——当文本超出节点大小时，自动以"..."结尾
 
-![image](./docs/images/showCase1.gif)</br>
+![image](./docs/images/showcase1.gif)</br>
 
 ## <a id="version"></a>版本支持
 目前经过测试的版本与系统如下，未列出的版本与系统仅表示暂未测试。
@@ -134,7 +134,101 @@ Font Tool界面如上图所示
         await this.waitCmpt(this, 0.1);
     }
     ```
-- 更多示例请参考仓库源码
+    
+    再更进一步，通过控制顶点颜色数据，逐顶点透明渐变
+
+    ![image](./docs/images/showcase3.gif)</br>
+
+    ```typescript
+    public alpha: number = 0;
+    private async anim3(): Promise<void> {
+        this.text3.string = "这 是 一 段 测 试 文 字";
+        this.text3.updateRenderData(true);
+        for (let i = 0; i < this.text3.string.length; i++) {
+            this.text3.setVisible(i, false);
+        }
+        let time = 0.5;
+        for (let i = 0; i < this.text3.string.length; i++) {
+            this.text3.setVisible(i, true);
+            if (!this.text3.isVisible(i)) {
+                continue;
+            }
+            this.text3.setVisible(i, false);
+            let result = this.text3.getColorExtraVertices(i);
+            this.alpha = 0;
+            tween<Main>(this)
+                .to(time / 2, { alpha: 255 }, {
+                    onUpdate: () => {
+                        result[0].a = this.alpha;
+                        result[2].a = this.alpha;
+                        this.text3.setColorExtraVertices(i, result);
+                    }
+                })
+                .call(() => {
+                    this.alpha = 0;
+                })
+                .to(time / 2, { alpha: 255 }, {
+                    onUpdate: () => {
+                        result[1].a = this.alpha;
+                        result[3].a = this.alpha;
+                        this.text3.setColorExtraVertices(i, result);
+                    }
+                })
+                .start();
+
+            await this.waitCmpt(this, time);
+        }
+    }
+    ```
+
+    再换一种方式，通过控制顶点数据，让字符逐个跃出
+
+    ![image](./docs/images/showcase4.gif)</br>
+
+    ```typescript
+    public _fScale: number = 1;
+    public _xOffset: number = 0;
+    private async anim1(): Promise<void> {
+        await this.waitCmpt(this, 1);
+        this.text1.string = "这 是 一 段 测 试 文 字";
+        this.text1.updateRenderData(true);
+        for (let i = 0; i < this.text1.string.length; i++) {
+            this.text1.setVisible(i, false);
+        }
+        for (let i = 0; i < this.text1.string.length; i++) {
+            this.text1.setVisible(i, true);
+            if (!this.text1.isVisible(i)) {
+                continue;
+            }
+            let result: Vec3[] = this.text1.getPosVertices(i);
+            let center = new Vec3();
+            center.x = (result[0].x + result[1].x + result[2].x + result[3].x) / 4;
+            center.y = (result[0].y + result[1].y + result[2].y + result[3].y) / 4;
+            this._xOffset = -50;
+
+            let updateCall = () => {
+                let copy: Vec3[] = [];
+                copy.push(result[0].clone());
+                copy.push(result[1].clone());
+                copy.push(result[2].clone());
+                copy.push(result[3].clone());
+                for (let j = 0; j < 4; j++) {
+                    let delta: Vec3 = new Vec3();
+                    Vec3.subtract(delta, copy[j], center);
+                    delta.multiplyScalar(this._fScale).add(new Vec3(this._xOffset, 0));
+                    Vec3.add(copy[j], center, delta);
+                }
+                this.text1.setPosVertices(i, copy as any);
+            }
+
+            tween<Main>(this)
+                .to(0.1, { _fScale: 2, _xOffset: -15 }, { onUpdate: updateCall })
+                .to(0.1, { _fScale: 1, _xOffset: 0 }, { onUpdate: updateCall })
+                .start();
+            await this.waitCmpt(this, 0.2);
+        }
+    }
+    ```
 
 ## <a id="note"></a>注意事项
 - 切勿将字体纹理打入图集中
