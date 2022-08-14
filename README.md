@@ -31,10 +31,13 @@
 ## <a id="version"></a>版本支持
 目前经过测试的版本与系统如下，未列出的版本与系统仅表示暂未测试。
 
-| Cocos Creator | v2.4.9 | v3.6.0 |
+| Cocos Creator | [v2.4.9](https://github.com/LeeYip/cocos-text-mesh-pro/tree/v2.4.9) | [v3.6.0](https://github.com/LeeYip/cocos-text-mesh-pro/tree/v3.6.0) |
 | :-: | :-: | :-: |
 | Android | ✓ | X |
 | Web | ✓ | ✓ |
+
+- v2.4.9分支应该都可用于2.4.x系列版本，只不过2.4.5及以下版本中引擎源码材质hash值计算有bug，会导致某些情况下无法合批，请自行测试
+- v3.6.0分支目前不支持低于3.6的版本，在3.6中引擎渲染实现有较大改动，故无法兼容
 
 ## <a id="how2use"></a>如何使用
 
@@ -61,12 +64,12 @@ Font Tool界面如上图所示
 ![image](./docs/images/compnent1.png)</br>
 组件参数如上图所示
 - Font：使用Font Tool导出的字体json文件
-- Overflow：除了Cocos Creator Label组件的排版方式之外，还提供了新的排版模式ELLIPSIS
+- Overflow：除了Cocos Creator Label组件的排版方式之外，还提供了新的排版模式ELLIPSIS。会自动计算文本大小，若超出节点大小，则以"..."结尾（**字体导出文本中必须包含字符"."**）
 
     ![image](./docs/images/compnent2.gif)</br>
 - EnableItalic：斜体
-- EnableUnderline：下划线，可调节高度
-- EnableStrikethrough：删除线，可调节高度
+- EnableUnderline：下划线，可调节高度（**字体导出文本中必须包含字符"_"**）
+- EnableStrikethrough：删除线，可调节高度（**字体导出文本中必须包含字符"_"**）
 - ColorGradient：颜色渐变开关，提供四个顶点的颜色设置，会和顶点颜色混合为最终的顶点颜色
 
     ![image](./docs/images/compnent3.png)</br>
