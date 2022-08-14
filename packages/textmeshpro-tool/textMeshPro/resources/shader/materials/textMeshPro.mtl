@@ -1,0 +1,64 @@
+{
+  "__type__": "cc.Material",
+  "_name": "textMeshPro",
+  "_objFlags": 0,
+  "_native": "",
+  "_effectAsset": {
+    "__uuid__": "f6b77afb-37e4-4198-9fb2-4e8257c2794e"
+  },
+  "_techniqueIndex": 0,
+  "_techniqueData": {
+    "0": {
+      "props": {
+        "outlineThickness": 0.3,
+        "underlayOffsetX": 0.002,
+        "underlayOffsetY": -0.002,
+        "glowInner": 0.3,
+        "glowOuter": 0.5,
+        "faceSoftness": 0,
+        "faceDilate": 0.5,
+        "outlineColor": {
+          "__type__": "cc.Color",
+          "r": 255,
+          "g": 0,
+          "b": 0,
+          "a": 255
+        },
+        "glowColor": {
+          "__type__": "cc.Color",
+          "r": 4,
+          "g": 255,
+          "b": 0,
+          "a": 255
+        },
+        "faceColor": {
+          "__type__": "cc.Color",
+          "r": 255,
+          "g": 255,
+          "b": 255,
+          "a": 255
+        },
+        "glowOffset": 0.5,
+        "underlayColor": {
+          "__type__": "cc.Color",
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 255
+        },
+        "underlaySoftness": 0.1,
+        "underlayDilate": 0.5,
+        "glowPower": 1
+      },
+      "defines": {
+        "USE_TEXTURE_LEVEL_1": true,
+        "USE_TEXTURE_LEVEL_2": false,
+        "USE_TEXTURE_LEVEL_3": false,
+        "USE_TEXTURE_LEVEL_4": false,
+        "USE_OUTLINE": false,
+        "USE_UNDERLAY": false,
+        "USE_GLOW": false
+      }
+    }
+  }
+}
