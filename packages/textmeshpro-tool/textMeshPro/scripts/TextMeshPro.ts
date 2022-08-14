@@ -530,7 +530,7 @@ export default class TextMeshPro extends cc.RenderComponent {
 
     protected resetInEditor(): void {
         if (CC_EDITOR) {
-            TmpUtils.load<cc.Material>("resources/shader/materials/textMeshPro.mtl").then((mat) => {
+            TmpUtils.load<cc.Material>("textMeshPro/resources/shader/materials/textMeshPro.mtl").then((mat) => {
                 if (mat) {
                     this.setMaterial(0, mat);
                 }
