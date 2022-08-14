@@ -644,10 +644,10 @@ export default class TextMeshPro extends cc.RenderComponent {
         if (!material || this.textures.length <= 0) {
             return;
         }
-        material.define("USE_TEXTURE_LEVEL_1", this.textures.length >= 1);
-        material.define("USE_TEXTURE_LEVEL_2", this.textures.length >= 2);
-        material.define("USE_TEXTURE_LEVEL_3", this.textures.length >= 4);
-        material.define("USE_TEXTURE_LEVEL_4", this.textures.length >= 8);
+        material.define("USE_TEXTURE_LEVEL_1", this.textures.length > 0);
+        material.define("USE_TEXTURE_LEVEL_2", this.textures.length > 1);
+        material.define("USE_TEXTURE_LEVEL_3", this.textures.length > 2);
+        material.define("USE_TEXTURE_LEVEL_4", this.textures.length > 4);
         for (let i = 0; i < this.textures.length; i++) {
             material.setProperty(`texture${i}`, this.textures[i]);
         }
