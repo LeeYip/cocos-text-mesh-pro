@@ -8,7 +8,7 @@ const utils = require("./utils");
 
 const EXAMPLE_PATH = "/packages/textmeshpro-tool/textMeshPro";
 const CONFIG_PATH = "/packages/textmeshpro-tool/config.json";
-const TEMP_PATH = "/extensions/textmeshpro-tool/dist/temp";
+const TEMP_PATH = "/packages/textmeshpro-tool/temp";
 const TEMP_HIERO_PATH = "/packages/textmeshpro-tool/temp/hieroConfig.hiero";
 
 let config = {

@@ -5,10 +5,10 @@
     "author": "Yip",
     "main": "main.js",
     "main-menu": {
-        "i18n:MAIN_MENU.package.title/TextMeshPro/Tool": {
+        "i18n:MAIN_MENU.package.title/TextMeshPro/Font Tool": {
             "message": "textmeshpro-tool:openPanel"
         },
-        "i18n:MAIN_MENU.package.title/TextMeshPro/Import": {
+        "i18n:MAIN_MENU.package.title/TextMeshPro/Import Assets": {
             "message": "textmeshpro-tool:importExample"
         }
     },
