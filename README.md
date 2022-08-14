@@ -133,3 +133,4 @@ Font Tool界面如上图所示
         await this.waitCmpt(this, 0.1);
     }
     ```
+- 更多示例请参考仓库源码
