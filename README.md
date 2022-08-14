@@ -12,7 +12,7 @@
     - [Example](#example)
 
 ## <a id="preface"></a>前言
-用过Unity的应该知道，UGUI中的TextMeshPro功能强大，是一套极佳的文本渲染解决方案。此项目旨在为Cocos Creator提供类似的方案。由于需要重写渲染组件以及顶点数据填充，而Cocos Creator不同版本渲染实现差异较大无法兼容，故针对不同版本建了不同Git分支，使用前请切换对应的分支。
+用过Unity的应该知道，UGUI中的TextMeshPro功能强大，是一套极佳的文本渲染解决方案。此项目旨在为Cocos Creator提供类似的方案，以相对较低的代价，实现各种文本效果。由于需要重写渲染组件以及顶点数据填充，而Cocos Creator不同版本渲染实现差异较大无法兼容，故针对不同版本建了不同Git分支，使用前请切换对应的分支。
 
 ## <a id="feature"></a>特性
 - 基于SDF进行文本渲染，无损放大
@@ -88,7 +88,7 @@ Font Tool界面如上图所示
 
         ![image](./docs/images/compnent6.png)</br>
     - UnderlayColor：阴影颜色
-    - UnderlayOffset：阴影偏移
+    - UnderlayOffset：阴影偏移，如x方向偏移一个像素则需填入的值为1/纹理宽度，y方向同理
     - UnderlayDilate：阴影厚度
     - UnderlaySoftness：阴影柔和度
     - EnableGlow：辉光开关，可以理解为在其他文本效果之上叠加一层描边，所以底下的颜色越暗效果越明显
