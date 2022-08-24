@@ -209,7 +209,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": 269.41,
+      "y": 240,
       "z": 0
     },
     "_lrot": {
@@ -416,7 +416,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": 187.409,
+      "y": 160,
       "z": 0
     },
     "_lrot": {
@@ -598,8 +598,8 @@
       "a": 255
     },
     "_glowOffset": 0.5,
-    "_glowInner": 0,
-    "_glowOuter": 1,
+    "_glowInner": 0.01,
+    "_glowOuter": 0.7,
     "_glowPower": 1
   },
   {
@@ -623,7 +623,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": 121.872,
+      "y": 100,
       "z": 0
     },
     "_lrot": {
@@ -830,7 +830,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": 50.207,
+      "y": 30,
       "z": 0
     },
     "_lrot": {
@@ -1426,8 +1426,8 @@
       "a": 255
     },
     "_glowOffset": 0.5,
-    "_glowInner": 0.48,
-    "_glowOuter": 1,
+    "_glowInner": 0.2,
+    "_glowOuter": 0.8,
     "_glowPower": 1
   },
   {
@@ -1633,8 +1633,8 @@
       "a": 255
     },
     "_glowOffset": 0.5,
-    "_glowInner": 0.48,
-    "_glowOuter": 1,
+    "_glowInner": 0.5,
+    "_glowOuter": 0.5,
     "_glowPower": 1
   },
   {

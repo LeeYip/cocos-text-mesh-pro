@@ -1,4 +1,4 @@
-import { color, Color, gfx, HorizontalTextAlignment, log, Mat4, misc, Rect, rect, RenderData, size, UITransform, v2, Vec2, Vec3, VerticalTextAlignment } from "cc";
+import { Color, HorizontalTextAlignment, log, Mat4, misc, Rect, rect, RenderData, size, SpriteFrame, Texture2D, UITransform, v2, Vec2, Vec3, VerticalTextAlignment } from "cc";
 import { JSB } from "cc/env";
 import TextMeshPro, { TmpOverflow } from "../TextMeshPro";
 import TmpFontConfig, { TmpFontLetter } from "./TmpFontConfig";
@@ -62,6 +62,7 @@ let _isWrapText = false;
 let _labelWidth = 0;
 let _labelHeight = 0;
 let _maxLineWidth = 0;
+let QUAD_INDICES;
 
 /** 斜体计算向量 */
 let _italicVec = v2();
@@ -181,9 +182,56 @@ export default class TmpAssembler {
         }
         if (comp.textures.length > 0) {
             const renderData = comp.renderData;
+            renderData.textureDirty = false;
             renderData.updateRenderData(comp, comp.textures[0]);
+            // this.hackUpdateRenderData(renderData, comp, comp.textures[0]);
         }
     }
+
+    // private static hackUpdateRenderData(renderData: RenderData, comp: TextMeshPro, frame: SpriteFrame | Texture2D) {
+    //     if (renderData.passDirty) {
+    //         renderData.material = comp.getRenderMaterial(0)!;
+    //         renderData.passDirty = false;
+    //         renderData.hashDirty = true;
+
+    //         if (renderData["_renderDrawInfo"]) {
+    //             renderData["_renderDrawInfo"].setMaterial(renderData.material);
+    //         }
+    //     }
+    //     if (renderData.nodeDirty) {
+    //         const renderScene = comp.node.scene ? comp._getRenderScene() : null;
+    //         renderData.layer = comp.node.layer;
+    //         // Hack for updateRenderData when node not add to scene
+    //         if (renderScene !== null) {
+    //             renderData.nodeDirty = false;
+    //         }
+    //         renderData.hashDirty = true;
+    //     }
+    //     if (renderData.textureDirty) {
+    //         renderData.frame = frame;
+    //         renderData.textureHash = frame.getHash();
+    //         renderData.textureDirty = false;
+    //         renderData.hashDirty = true;
+
+    //         if (renderData["_renderDrawInfo"]) {
+    //             renderData["_renderDrawInfo"].setTexture(renderData.frame ? renderData.frame.getGFXTexture() : null);
+    //             renderData["_renderDrawInfo"].setSampler(renderData.frame ? renderData.frame.getGFXSampler() : null);
+    //         }
+    //     }
+    //     if (renderData.hashDirty) {
+    //         renderData.updateHash();
+
+    //         if (renderData["_renderDrawInfo"]) {
+    //             renderData["_renderDrawInfo"].setDataHash(renderData.dataHash);
+    //         }
+    //     }
+
+    //     // Hack Do not update pre frame
+    //     if (JSB && renderData.multiOwner === false) {
+    //         // sync shared buffer to native
+    //         renderData["_renderDrawInfo"].fillRender2dBuffer(renderData["_data"]);
+    //     }
+    // }
 
     static updateColor(comp: TextMeshPro) {
         if (JSB) {
@@ -850,6 +898,29 @@ export default class TmpAssembler {
         }
 
         this.updateColorExtra(_comp);
+
+        const indexCount = renderData.indexCount;
+        this.createQuadIndices(indexCount);
+        renderData.chunk.setIndexBuffer(QUAD_INDICES);
+    }
+
+    private static createQuadIndices(indexCount) {
+        if (indexCount % 6 !== 0) {
+            console.error('illegal index count!');
+            return;
+        }
+        const quadCount = indexCount / 6;
+        QUAD_INDICES = null;
+        QUAD_INDICES = new Uint16Array(indexCount);
+        let offset = 0;
+        for (let i = 0; i < quadCount; i++) {
+            QUAD_INDICES[offset++] = 0 + i * 4;
+            QUAD_INDICES[offset++] = 1 + i * 4;
+            QUAD_INDICES[offset++] = 2 + i * 4;
+            QUAD_INDICES[offset++] = 1 + i * 4;
+            QUAD_INDICES[offset++] = 3 + i * 4;
+            QUAD_INDICES[offset++] = 2 + i * 4;
+        }
     }
 
     /**
@@ -948,12 +1019,11 @@ export default class TmpAssembler {
             return;
         }
 
+        // 此处会将renderData.chunk.vb置0
         const dataOffset = renderData.dataLength;
         renderData.dataLength += 4;
         renderData.resize(renderData.dataLength, renderData.dataLength / 2 * 3);
         const dataList = renderData.data;
-
-        let verts = renderData.chunk.vb;
 
         let texture = shareLabelInfo.fontAtlas.getTexture(textureId);
         let texw = texture.width,
@@ -982,13 +1052,6 @@ export default class TmpAssembler {
         b = posRect.y - posRect.height;
         t = posRect.y;
         this.appendVerts(comp, dataList, dataOffset, l, r, b, t);
-
-        // colors
-        // let colorOffset = _dataOffset + this.colorOffset;
-        // for (let i = 0; i < 4; i++) {
-        //     uintVerts[colorOffset] = color;
-        //     colorOffset += floatsPerVert;
-        // }
 
         // colorExtra
         for (let i = 0; i < 4; i++) {
@@ -1034,33 +1097,93 @@ export default class TmpAssembler {
         const dataList = comp.renderData.data;
         if (!dataList || dataList.length <= 0) { return; }
 
-        for (let i = 0; i < comp.lettersInfo.length; i++) {
-            let info = comp.lettersInfo[i];
-            if (!info.valid || TmpUtils.isUnicodeSpace(info.char)) {
-                continue;
+        if (!JSB) {
+            for (let i = 0; i < comp.lettersInfo.length; i++) {
+                let info = comp.lettersInfo[i];
+                if (!info.valid || TmpUtils.isUnicodeSpace(info.char)) {
+                    continue;
+                }
+                let alpha = info.visible ? 1 : 0;
+                let offset = info.quadsIndex * 4;
+
+                tempColor.set(WHITE);
+                tempColor.a *= alpha;
+                comp.colorGradient && tempColor.multiply(comp.colorLB);
+                dataList[offset]["colorExtra"].set(tempColor);
+
+                tempColor.set(WHITE);
+                tempColor.a *= alpha;
+                comp.colorGradient && tempColor.multiply(comp.colorRB);
+                dataList[offset + 1]["colorExtra"].set(tempColor);
+
+                tempColor.set(WHITE);
+                tempColor.a *= alpha;
+                comp.colorGradient && tempColor.multiply(comp.colorLT);
+                dataList[offset + 2]["colorExtra"].set(tempColor);
+
+                tempColor.set(WHITE);
+                tempColor.a *= alpha;
+                comp.colorGradient && tempColor.multiply(comp.colorRT);
+                dataList[offset + 3]["colorExtra"].set(tempColor);
             }
-            let alpha = info.visible ? 1 : 0;
-            let offset = info.quadsIndex * 4;
+        } else {
+            const renderData = comp.renderData!;
+            const vData = comp.renderData.chunk.vb;
+            const vertexCount = renderData.vertexCount;
+            let quadCount = vertexCount / 4;
+            let letterIndex = 0;
+            for (let i = 0; i < quadCount; i++) {
+                while (letterIndex < comp.lettersInfo.length && !comp.lettersInfo[letterIndex].valid) {
+                    letterIndex++;
+                }
+                if (letterIndex < comp.lettersInfo.length) {
+                    let info = comp.lettersInfo[letterIndex];
+                    let alpha = info.visible ? 1 : 0;
+                    let offset = i * 4;
 
-            tempColor.set(WHITE);
-            tempColor.a *= alpha;
-            comp.colorGradient && tempColor.multiply(comp.colorLB);
-            dataList[offset]["colorExtra"].set(tempColor);
+                    tempColor.set(WHITE);
+                    tempColor.a *= alpha;
+                    comp.colorGradient && tempColor.multiply(comp.colorLB);
+                    dataList[offset]["colorExtra"].set(tempColor);
 
-            tempColor.set(WHITE);
-            tempColor.a *= alpha;
-            comp.colorGradient && tempColor.multiply(comp.colorRB);
-            dataList[offset + 1]["colorExtra"].set(tempColor);
+                    tempColor.set(WHITE);
+                    tempColor.a *= alpha;
+                    comp.colorGradient && tempColor.multiply(comp.colorRB);
+                    dataList[offset + 1]["colorExtra"].set(tempColor);
 
-            tempColor.set(WHITE);
-            tempColor.a *= alpha;
-            comp.colorGradient && tempColor.multiply(comp.colorLT);
-            dataList[offset + 2]["colorExtra"].set(tempColor);
+                    tempColor.set(WHITE);
+                    tempColor.a *= alpha;
+                    comp.colorGradient && tempColor.multiply(comp.colorLT);
+                    dataList[offset + 2]["colorExtra"].set(tempColor);
 
-            tempColor.set(WHITE);
-            tempColor.a *= alpha;
-            comp.colorGradient && tempColor.multiply(comp.colorRT);
-            dataList[offset + 3]["colorExtra"].set(tempColor);
+                    tempColor.set(WHITE);
+                    tempColor.a *= alpha;
+                    comp.colorGradient && tempColor.multiply(comp.colorRT);
+                    dataList[offset + 3]["colorExtra"].set(tempColor);
+
+                    let colorExtraOffset = offset * this.floatsPerVert + this.colorExtraOffset;
+                    for (let i = 0; i < 4; i++) {
+                        const colorR = dataList[offset + i]["colorExtra"].r / 255;
+                        const colorG = dataList[offset + i]["colorExtra"].g / 255;
+                        const colorB = dataList[offset + i]["colorExtra"].b / 255;
+                        const colorA = dataList[offset + i]["colorExtra"].a / 255;
+                        vData[colorExtraOffset] = colorR;
+                        vData[colorExtraOffset + 1] = colorG;
+                        vData[colorExtraOffset + 2] = colorB;
+                        vData[colorExtraOffset + 3] = colorA;
+                        colorExtraOffset += this.floatsPerVert;
+                    }
+                } else {
+                    let colorExtraOffset = i * 4 * this.floatsPerVert + this.colorExtraOffset;
+                    for (let i = 0; i < 4; i++) {
+                        vData[colorExtraOffset] = 1;
+                        vData[colorExtraOffset + 1] = 1;
+                        vData[colorExtraOffset + 2] = 1;
+                        vData[colorExtraOffset + 3] = 1;
+                        colorExtraOffset += this.floatsPerVert;
+                    }
+                }
+            }
         }
     }
 
@@ -1109,6 +1232,22 @@ export default class TmpAssembler {
         tempColor.a *= alpha;
         comp.colorGradient && tempColor.multiply(comp.colorRT);
         dataList[offset + 3]["colorExtra"].set(tempColor);
+
+        if (JSB) {
+            const vData = comp.renderData.chunk.vb;
+            let colorExtraOffset = offset * this.floatsPerVert + this.colorExtraOffset;
+            for (let i = 0; i < 4; i++) {
+                const colorR = dataList[offset + i]["colorExtra"].r / 255;
+                const colorG = dataList[offset + i]["colorExtra"].g / 255;
+                const colorB = dataList[offset + i]["colorExtra"].b / 255;
+                const colorA = dataList[offset + i]["colorExtra"].a / 255;
+                vData[colorExtraOffset] = colorR;
+                vData[colorExtraOffset + 1] = colorG;
+                vData[colorExtraOffset + 2] = colorB;
+                vData[colorExtraOffset + 3] = colorA;
+                colorExtraOffset += this.floatsPerVert;
+            }
+        }
     }
 
     /**
@@ -1147,6 +1286,22 @@ export default class TmpAssembler {
 
         for (let i = 0; i < 4; i++) {
             dataList[offset + i]["colorExtra"].set(data[i]);
+        }
+
+        if (JSB) {
+            const vData = comp.renderData.chunk.vb;
+            let colorExtraOffset = offset * this.floatsPerVert + this.colorExtraOffset;
+            for (let i = 0; i < 4; i++) {
+                const colorR = dataList[offset + i]["colorExtra"].r / 255;
+                const colorG = dataList[offset + i]["colorExtra"].g / 255;
+                const colorB = dataList[offset + i]["colorExtra"].b / 255;
+                const colorA = dataList[offset + i]["colorExtra"].a / 255;
+                vData[colorExtraOffset] = colorR;
+                vData[colorExtraOffset + 1] = colorG;
+                vData[colorExtraOffset + 2] = colorB;
+                vData[colorExtraOffset + 3] = colorA;
+                colorExtraOffset += this.floatsPerVert;
+            }
         }
     }
 
@@ -1187,6 +1342,10 @@ export default class TmpAssembler {
             dataList[offset + i].x = data[i].x;
             dataList[offset + i].y = data[i].y;
             dataList[offset + i].z = data[i].z;
+        }
+
+        if (JSB) {
+            comp.renderData.renderDrawInfo.nativeObj["vertDirty"] = true;
         }
     }
 

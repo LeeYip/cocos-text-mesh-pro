@@ -601,8 +601,9 @@ export default class TextMeshPro extends UIRenderer {
      * @zh 请求新的渲染数据对象。
      * @return The new render data
      */
-    public requestRenderData() {
+    public requestRenderData(drawInfoType = 0) {
         const data = RenderData.add(vfmt);
+        data.initRenderDrawInfo(this, drawInfoType);
         this._renderData = data;
         return data;
     }
@@ -713,7 +714,7 @@ export default class TextMeshPro extends UIRenderer {
     // Cannot use the base class methods directly because BMFont and CHAR cannot be updated in assambler with just color.
     protected _updateColor() {
         super._updateColor();
-        this.updateRenderData();
+        this.markForUpdateRenderData();
     }
 
     public setEntityColor(color: Color) {
@@ -755,7 +756,7 @@ export default class TextMeshPro extends UIRenderer {
         this.markForUpdateRenderData();
         if (this.textures.length > 0) {
             if (this.renderData) {
-                this.renderData.textureDirty = true;
+                // this.renderData.textureDirty = true;
             }
             this.changeMaterialForDefine();
             if (this._assembler) {
