@@ -184,54 +184,8 @@ export default class TmpAssembler {
             const renderData = comp.renderData;
             renderData.textureDirty = false;
             renderData.updateRenderData(comp, comp.textures[0]);
-            // this.hackUpdateRenderData(renderData, comp, comp.textures[0]);
         }
     }
-
-    // private static hackUpdateRenderData(renderData: RenderData, comp: TextMeshPro, frame: SpriteFrame | Texture2D) {
-    //     if (renderData.passDirty) {
-    //         renderData.material = comp.getRenderMaterial(0)!;
-    //         renderData.passDirty = false;
-    //         renderData.hashDirty = true;
-
-    //         if (renderData["_renderDrawInfo"]) {
-    //             renderData["_renderDrawInfo"].setMaterial(renderData.material);
-    //         }
-    //     }
-    //     if (renderData.nodeDirty) {
-    //         const renderScene = comp.node.scene ? comp._getRenderScene() : null;
-    //         renderData.layer = comp.node.layer;
-    //         // Hack for updateRenderData when node not add to scene
-    //         if (renderScene !== null) {
-    //             renderData.nodeDirty = false;
-    //         }
-    //         renderData.hashDirty = true;
-    //     }
-    //     if (renderData.textureDirty) {
-    //         renderData.frame = frame;
-    //         renderData.textureHash = frame.getHash();
-    //         renderData.textureDirty = false;
-    //         renderData.hashDirty = true;
-
-    //         if (renderData["_renderDrawInfo"]) {
-    //             renderData["_renderDrawInfo"].setTexture(renderData.frame ? renderData.frame.getGFXTexture() : null);
-    //             renderData["_renderDrawInfo"].setSampler(renderData.frame ? renderData.frame.getGFXSampler() : null);
-    //         }
-    //     }
-    //     if (renderData.hashDirty) {
-    //         renderData.updateHash();
-
-    //         if (renderData["_renderDrawInfo"]) {
-    //             renderData["_renderDrawInfo"].setDataHash(renderData.dataHash);
-    //         }
-    //     }
-
-    //     // Hack Do not update pre frame
-    //     if (JSB && renderData.multiOwner === false) {
-    //         // sync shared buffer to native
-    //         renderData["_renderDrawInfo"].fillRender2dBuffer(renderData["_data"]);
-    //     }
-    // }
 
     static updateColor(comp: TextMeshPro) {
         if (JSB) {
@@ -1346,6 +1300,7 @@ export default class TmpAssembler {
 
         if (JSB) {
             comp.renderData.renderDrawInfo.nativeObj["vertDirty"] = true;
+            comp.renderData.renderDrawInfo.fillRender2dBuffer(comp.renderData.data);
         }
     }
 
