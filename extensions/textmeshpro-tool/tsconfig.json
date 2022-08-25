@@ -10,5 +10,8 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
-    }
+    },
+    "exclude": [
+        "./textMeshPro"
+    ],
 }
