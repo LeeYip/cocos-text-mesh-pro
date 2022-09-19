@@ -16,7 +16,7 @@
         "main": "panel/index.js",
         "type": "dockable",
         "title": "TextMeshPro Tool",
-        "width": 700,
-        "height": 350
+        "width": 600,
+        "height": 400
     }
 }

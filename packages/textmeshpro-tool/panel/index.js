@@ -34,73 +34,78 @@ Editor.Panel.extend({
             cursor: default;
         }
 
-        .mainview {
+        .section {
+            margin: 10px;
+            padding: 0 10px;
             flex: 1;
-            padding: 10px;
-            padding-top: 0px;
             overflow-y: auto;
-            overflow-x: hidden;
         }
 
-        .section {
-            border-bottom: 1px solid #666;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
+        .footer {
+            border-top: 1px solid #666;
+            display: block;
+            padding: 15px 0;
+            margin: 0 20px;
+            justify-content: flex-end;
+        }
+
+        .end-area {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
         }
     `,
 
     template: `
-        <ui-markdown>
-            ***
-        </ui-markdown>
-        <div class="mainview">
-            <div class="section">
-                <ui-prop name="Hiero路径" class="flex-1" tabindex="-1">
-                    <ui-input id="hieroPath" placeholder="Hiero path..." class="flex-2" tabindex="-1"></ui-input>
-                    <ui-button id="btnHiero" class="tiny" tabindex="-1">...</ui-button>
-                    <ui-button id="btnDownload" class="tiny" tabindex="-1">下载</ui-button>
-                </ui-prop>
+        <div class="section">
+            <ui-prop name="Hiero路径" class="flex-1" tabindex="-1">
+                <ui-input id="hieroPath" placeholder="Hiero path..." class="flex-2" tabindex="-1"></ui-input>
+                <ui-button id="btnHiero" class="tiny" tabindex="-1">...</ui-button>
+                <ui-button id="btnDownload" class="tiny" tabindex="-1">下载</ui-button>
+            </ui-prop>
 
-                <ui-prop name="源字体" class="flex-1" tabindex="-1">
-                    <ui-input id="fontPath" placeholder="font path..." class="flex-2" tabindex="-1"></ui-input>
-                    <ui-button id="btnFontPath" class="tiny" tabindex="-1">...</ui-button>
-                </ui-prop>
+            <ui-prop name="源字体" class="flex-1" tabindex="-1">
+                <ui-input id="fontPath" placeholder="font path..." class="flex-2" tabindex="-1"></ui-input>
+                <ui-button id="btnFontPath" class="tiny" tabindex="-1">...</ui-button>
+            </ui-prop>
 
-                <ui-prop name="导出目录" class="flex-1" tabindex="-1">
-                    <ui-input id="exportDir" placeholder="export path..." class="flex-2" tabindex="-1"></ui-input>
-                    <ui-button id="btnExportDir" class="tiny" tabindex="-1">...</ui-button>
-                </ui-prop>
-                <ui-prop name="导出名称" class="flex-1" tabindex="-1">
-                    <ui-input id="exportName" placeholder="export font name..." class="flex-1" tabindex="-1"></ui-input>
-                </ui-prop>
+            <ui-prop name="导出目录" class="flex-1" tabindex="-1">
+                <ui-input id="exportDir" placeholder="export path..." class="flex-2" tabindex="-1"></ui-input>
+                <ui-button id="btnExportDir" class="tiny" tabindex="-1">...</ui-button>
+            </ui-prop>
+            <ui-prop name="导出名称" class="flex-1" tabindex="-1">
+                <ui-input id="exportName" placeholder="export font name..." class="flex-1" tabindex="-1"></ui-input>
+            </ui-prop>
 
-                <ui-prop name="导出文本" class="flex-1" tabindex="-1">
-                    <ui-select id="textSelect" value="0">
-                        <option value="0">输入框</option>
-                        <option value="1">文本文件</option>
-                    </ui-select>
-                </ui-prop>
-                <ui-prop id="textStr" name="输入框" type="string" value="" multiline auto-height class="flex-1" tabindex="1"></ui-prop>
-                <ui-prop id="textPathElement" name="文本文件" class="flex-1" tabindex="1">
-                    <ui-input id="textPath" placeholder="txt path..." class="flex-2" tabindex="2"></ui-input>
-                    <ui-button id="btnTextPath" class="tiny" tabindex="-1">...</ui-button>
-                </ui-prop>
+            <ui-prop name="导出文本" class="flex-1" tabindex="-1">
+                <ui-select id="textSelect" value="0">
+                    <option value="0">输入框</option>
+                    <option value="1">文本文件</option>
+                </ui-select>
+            </ui-prop>
+            <ui-prop id="textStr" name="输入框" type="string" value="" multiline auto-height class="flex-1" tabindex="1"></ui-prop>
+            <ui-prop id="textPathElement" name="文本文件" class="flex-1" tabindex="1">
+                <ui-input id="textPath" placeholder="txt path..." class="flex-2" tabindex="2"></ui-input>
+                <ui-button id="btnTextPath" class="tiny" tabindex="-1">...</ui-button>
+            </ui-prop>
 
-                <ui-prop name="字体参数" class="flex-1" tabindex="-1">
-                    <ui-prop id="fontSize" name="Font Size" type="number" value="32" class="flex-1" tabindex="-1"></ui-prop>
-                    <ui-prop id="padding" name="Padding" type="number" value="5" class="flex-1" tabindex="-1"></ui-prop>
-                </ui-prop>
-                <ui-prop name="纹理参数" class="flex-1" tabindex="-1">
-                    <ui-prop id="width" name="Width" type="number" value="1024" class="flex-1" tabindex="-1"></ui-prop>
-                    <ui-prop id="height" name="Height" type="number" value="1024" class="flex-1" tabindex="-1"></ui-prop>
-                </ui-prop>
-                <ui-prop id="scale" name="SDF Scale" type="number" value="10" class="flex-1" tabindex="-1"></ui-prop>
-            </div>
-            <div class="bottom layout horizontal end-justified">
+            <ui-prop name="字体参数" class="flex-1" tabindex="-1">
+                <ui-prop id="fontSize" name="Font Size" type="number" value="32" class="flex-1" tabindex="-1"></ui-prop>
+                <ui-prop id="padding" name="Padding" type="number" value="5" class="flex-1" tabindex="-1"></ui-prop>
+            </ui-prop>
+            <ui-prop name="纹理参数" class="flex-1" tabindex="-1">
+                <ui-prop id="width" name="Width" type="number" value="1024" class="flex-1" tabindex="-1"></ui-prop>
+                <ui-prop id="height" name="Height" type="number" value="1024" class="flex-1" tabindex="-1"></ui-prop>
+            </ui-prop>
+            <ui-prop id="scale" name="SDF Scale" type="number" value="10" class="flex-1" tabindex="-1"></ui-prop>
+        </div>
+
+        <div class="footer">
+            <div class="end-area">
                 <ui-button id="btnSave" class="tiny green" tabindex="-1">Save</ui-button>
                 <ui-button id="btnExport" class="tiny green" tabindex="-1">Export</ui-button>
             </div>
-        </div>
+        </div class="footer">
     `,
 
     $: {
