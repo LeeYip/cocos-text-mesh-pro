@@ -72,7 +72,7 @@ function exportFont() {
             fs.mkdirSync(`${Editor.Project.path}${TEMP_PATH}`);
         }
         Utils.writeHiero(`${Editor.Project.path}${TEMP_HIERO_PATH}`, config);
-        let cmdStr = `${config.hieroPath} -i ${Editor.Project.path}${TEMP_HIERO_PATH} -o ${config.exportDir}/${config.exportName}.fnt -b`;
+        let cmdStr = `java -jar ${config.hieroPath} -i ${Editor.Project.path}${TEMP_HIERO_PATH} -o ${config.exportDir}/${config.exportName}.fnt -b`;
 
         console.log("[textmeshpro-tool] 正在输出字体文件，请耐心等待Hiero窗口自行关闭...");
         let time = Date.now();
