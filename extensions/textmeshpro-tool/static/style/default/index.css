@@ -1,18 +1,31 @@
-.mainview {
+.content {
+    position: relative;
     flex: 1;
+    width: 100%;
+    padding: 16px;
     display: flex;
     flex-direction: column;
-    flex-wrap: nowrap;
+    box-sizing: border-box;
+    background: var(--color-normal-fill);
+    border: 1px solid var(--color-normal-border);
+    border-radius: 4px;
+}
+
+.content>section {
+    flex: 1;
     padding: 10px;
-    padding-top: 10px;
     overflow-y: auto;
     overflow-x: hidden;
-    border-bottom: 1px solid #666;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
 }
 
 .prop {
     margin-bottom: 5px;
     margin-right: 5px;
+}
+
+.footer {
+    padding: 10px;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
 }

@@ -15,7 +15,7 @@
     },
     "panels": {
         "default": {
-            "title": "textmeshpro-tool Default Panel",
+            "title": "textmeshpro-tool",
             "type": "dockable",
             "main": "dist/panels/default",
             "size": {
