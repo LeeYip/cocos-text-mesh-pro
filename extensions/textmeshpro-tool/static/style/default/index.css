@@ -1,3 +1,25 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    font-size: 12px;
+}
+
+.settings {
+    position: absolute;
+    z-index: 2;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    padding: 8px;
+    display: flex;
+    box-sizing: border-box;
+    background: var(--color-normal-fill-important);
+}
+
 .content {
     position: relative;
     flex: 1;
@@ -18,12 +40,20 @@
     overflow-x: hidden;
 }
 
+.mainview {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+}
+
 .prop {
     margin-bottom: 5px;
     margin-right: 5px;
 }
 
 .footer {
+    border-top: 1px solid var(--color-normal-border);
     padding: 10px;
     text-align: right;
     display: flex;

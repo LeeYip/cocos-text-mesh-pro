@@ -1,72 +1,80 @@
-<div class="content">
-    <section class="mainview">
-        <ui-prop class="prop">
-            <ui-label slot="label">Hiero路径</ui-label>
-            <ui-file id="hieroPath" slot="content" extensions="jar" placeholder="Hiero path..." style="flex: 6;">
-            </ui-file>
-            <ui-button id="btnDownload" slot="content" style="flex: 1;">下载</ui-button>
-        </ui-prop>
+<div class="builder container">
+    <div class="settings">
+        <div class="content">
+            <section>
+                <div class="mainview">
+                    <ui-prop class="prop">
+                        <ui-label slot="label">Hiero路径</ui-label>
+                        <ui-file id="hieroPath" slot="content" extensions="jar" placeholder="Hiero path..."
+                            style="flex: 6;">
+                        </ui-file>
+                        <ui-button id="btnDownload" slot="content" style="flex: 1;">下载</ui-button>
+                    </ui-prop>
 
-        <ui-prop class="prop">
-            <ui-label slot="label">源字体</ui-label>
-            <ui-file id="fontPath" slot="content" extensions="ttf" placeholder="font path..."></ui-file>
-        </ui-prop>
+                    <ui-prop class="prop">
+                        <ui-label slot="label">源字体</ui-label>
+                        <ui-file id="fontPath" slot="content" extensions="ttf" placeholder="font path..."></ui-file>
+                    </ui-prop>
 
-        <ui-prop class="prop">
-            <ui-label slot="label">导出目录</ui-label>
-            <ui-file id="exportDir" slot="content" type="directory" placeholder="export path..."></ui-file>
-        </ui-prop>
-        <ui-prop class="prop">
-            <ui-label slot="label">导出名称</ui-label>
-            <ui-input id="exportName" slot="content" placeholder="export font name..." tabindex="0"></ui-input>
-        </ui-prop>
+                    <ui-prop class="prop">
+                        <ui-label slot="label">导出目录</ui-label>
+                        <ui-file id="exportDir" slot="content" type="directory" placeholder="export path..."></ui-file>
+                    </ui-prop>
+                    <ui-prop class="prop">
+                        <ui-label slot="label">导出名称</ui-label>
+                        <ui-input id="exportName" slot="content" placeholder="export font name..." tabindex="0">
+                        </ui-input>
+                    </ui-prop>
 
-        <ui-prop class="prop">
-            <ui-label slot="label">导出文本</ui-label>
-            <ui-select id="textSelect" slot="content" value="0">
-                <option value="0">输入框</option>
-                <option value="1">文本文件</option>
-            </ui-select>
-        </ui-prop>
-        <ui-prop id="textStrElement" class="prop">
-            <ui-label slot="label">输入框</ui-label>
-            <ui-textarea id="textStr" slot="content" value="" multiline auto-height></ui-textarea>
-        </ui-prop>
-        <ui-prop id="textPathElement" class="prop">
-            <ui-label slot="label">文本文件</ui-label>
-            <ui-file id="textPath" slot="content" extensions="txt" placeholder="txt path..."></ui-file>
-        </ui-prop>
+                    <ui-prop class="prop">
+                        <ui-label slot="label">导出文本</ui-label>
+                        <ui-select id="textSelect" slot="content" value="0">
+                            <option value="0">输入框</option>
+                            <option value="1">文本文件</option>
+                        </ui-select>
+                    </ui-prop>
+                    <ui-prop id="textStrElement" class="prop">
+                        <ui-label slot="label">输入框</ui-label>
+                        <ui-textarea id="textStr" slot="content" value="" multiline auto-height></ui-textarea>
+                    </ui-prop>
+                    <ui-prop id="textPathElement" class="prop">
+                        <ui-label slot="label">文本文件</ui-label>
+                        <ui-file id="textPath" slot="content" extensions="txt" placeholder="txt path..."></ui-file>
+                    </ui-prop>
 
-        <ui-prop class="prop">
-            <ui-label slot="label">字体参数</ui-label>
-            <ui-prop class="prop" slot="content">
-                <ui-label slot="label">fontSize</ui-label>
-                <ui-num-input id="fontSize" slot="content" value="32" step="1"></ui-num-input>
-            </ui-prop>
-            <ui-prop class="prop" slot="content">
-                <ui-label slot="label">padding</ui-label>
-                <ui-num-input id="padding" slot="content" value="5" step="1"></ui-num-input>
-            </ui-prop>
-        </ui-prop>
-        <ui-prop class="prop">
-            <ui-label slot="label">纹理参数</ui-label>
-            <ui-prop class="prop" slot="content">
-                <ui-label slot="label">Width</ui-label>
-                <ui-num-input id="width" slot="content" value="1024" step="1"></ui-num-input>
-            </ui-prop>
-            <ui-prop class="prop" slot="content">
-                <ui-label slot="label">Height</ui-label>
-                <ui-num-input id="height" slot="content" value="1024" step="1"></ui-num-input>
-            </ui-prop>
-        </ui-prop>
-        <ui-prop class="prop">
-            <ui-label slot="label">SDF Scale</ui-label>
-            <ui-num-input id="scale" slot="content" value="10" step="1"></ui-num-input>
-        </ui-prop>
-    </section>
-</div>
-<div class="footer">
-    <ui-button id="btnSave" class="green">Save</ui-button>
-    <ui-label style="width: 20px;"></ui-label>
-    <ui-button id="btnExport" class="green">Export</ui-button>
+                    <ui-prop class="prop">
+                        <ui-label slot="label">字体参数</ui-label>
+                        <ui-prop class="prop" slot="content">
+                            <ui-label slot="label">fontSize</ui-label>
+                            <ui-num-input id="fontSize" slot="content" value="32" step="1"></ui-num-input>
+                        </ui-prop>
+                        <ui-prop class="prop" slot="content">
+                            <ui-label slot="label">padding</ui-label>
+                            <ui-num-input id="padding" slot="content" value="5" step="1"></ui-num-input>
+                        </ui-prop>
+                    </ui-prop>
+                    <ui-prop class="prop">
+                        <ui-label slot="label">纹理参数</ui-label>
+                        <ui-prop class="prop" slot="content">
+                            <ui-label slot="label">Width</ui-label>
+                            <ui-num-input id="width" slot="content" value="1024" step="1"></ui-num-input>
+                        </ui-prop>
+                        <ui-prop class="prop" slot="content">
+                            <ui-label slot="label">Height</ui-label>
+                            <ui-num-input id="height" slot="content" value="1024" step="1"></ui-num-input>
+                        </ui-prop>
+                    </ui-prop>
+                    <ui-prop class="prop">
+                        <ui-label slot="label">SDF Scale</ui-label>
+                        <ui-num-input id="scale" slot="content" value="10" step="1"></ui-num-input>
+                    </ui-prop>
+                </div>
+            </section>
+            <div class="footer">
+                <ui-button id="btnSave" class="blue">Save</ui-button>
+                <ui-label style="width: 20px;"></ui-label>
+                <ui-button id="btnExport" class="blue">Export</ui-button>
+            </div>
+        </div>
+    </div>
 </div>
