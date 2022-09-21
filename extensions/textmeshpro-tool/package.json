@@ -1,6 +1,6 @@
 {
     "package_version": 2,
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "textmeshpro-tool",
     "description": "i18n:textmeshpro-tool.description",
     "main": "./dist/main.js",
