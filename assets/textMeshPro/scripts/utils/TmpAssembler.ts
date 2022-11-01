@@ -33,7 +33,7 @@ let shareLabelInfo = {
     margin: 0,
 };
 
-let _comp = null;
+let _comp: TextMeshPro = null;
 let _tmpUvRect = cc.rect();
 let _tmpPosRect = cc.rect();
 let _horizontalKernings = [];
@@ -202,7 +202,7 @@ export default class TmpAssembler extends cc.Assembler {
         this._updateContent();
         this.updateWorldVerts(comp);
 
-        _comp._actualFontSize = _fontSize;
+        _comp["_actualFontSize"] = _fontSize;
         _comp.node.setContentSize(_contentSize);
 
         _comp._vertsDirty = false;
@@ -403,7 +403,8 @@ export default class TmpAssembler extends cc.Assembler {
                     useEllipsis = true;
                     // 更新_linesWidth
                     let ellipsisInfo = this._lettersInfo[this._lettersInfo.length - 1];
-                    letterRight = ellipsisInfo.x + _ellipsisDef.w * _bmfontScale - shareLabelInfo.margin;
+                    // letterRight = ellipsisInfo.x + _ellipsisDef.w * _bmfontScale - shareLabelInfo.margin;
+                    letterRight = ellipsisInfo.x + (_ellipsisDef.xAdvance - _ellipsisDef.offsetX) * _bmfontScale + _spacingX - shareLabelInfo.margin * 2;
                     break;
                 }
 
@@ -450,13 +451,14 @@ export default class TmpAssembler extends cc.Assembler {
 
                 // 省略号处理
                 if (_overflow === TmpOverflow.ELLIPSIS && _ellipsisDef) {
-                    if (letterX + letterDef.w * _bmfontScale > _maxLineWidth) {
+                    if (letterX + (letterDef.xAdvance - letterDef.offsetX) * _bmfontScale > _maxLineWidth) {
                         if (!_isWrapText || lineIndex + 1 >= ellipsisMaxLines) {
                             this._recordEllipsis(nextTokenY, letterPosition, lineIndex);
                             useEllipsis = true;
                             // 更新_linesWidth
                             let ellipsisInfo = this._lettersInfo[this._lettersInfo.length - 1];
-                            letterRight = ellipsisInfo.x + _ellipsisDef.w * _bmfontScale - shareLabelInfo.margin;
+                            // letterRight = ellipsisInfo.x + _ellipsisDef.w * _bmfontScale - shareLabelInfo.margin;
+                            letterRight = ellipsisInfo.x + (_ellipsisDef.xAdvance - _ellipsisDef.offsetX) * _bmfontScale + _spacingX - shareLabelInfo.margin * 2;
                             break;
                         }
                     }
@@ -465,7 +467,7 @@ export default class TmpAssembler extends cc.Assembler {
                 if (_isWrapText
                     && _maxLineWidth > 0
                     && nextTokenX > 0
-                    && letterX + letterDef.w * _bmfontScale > _maxLineWidth
+                    && letterX + (letterDef.xAdvance - letterDef.offsetX) * _bmfontScale > _maxLineWidth
                     && !cc.textUtils.isUnicodeSpace(character)) {
                     _linesWidth.push(letterRight);
                     letterRight = 0;
@@ -487,7 +489,8 @@ export default class TmpAssembler extends cc.Assembler {
 
                 nextLetterX += letterDef.xAdvance * _bmfontScale + _spacingX - shareLabelInfo.margin * 2;
 
-                tokenRight = letterPosition.x + letterDef.w * _bmfontScale - shareLabelInfo.margin;
+                // tokenRight = letterPosition.x + letterDef.w * _bmfontScale - shareLabelInfo.margin;
+                tokenRight = nextLetterX;
                 // 斜边处理
                 if ((_comp as TextMeshPro).enableItalic) {
                     _italicVec.x = 0;
@@ -556,6 +559,9 @@ export default class TmpAssembler extends cc.Assembler {
             }
         }
 
+        // 记录letterRight与nextTokenX的差值，供富文本排版使用
+        _comp["_richTextDeltaX"] = nextTokenX - letterRight;
+
         return true;
     }
 
@@ -591,7 +597,7 @@ export default class TmpAssembler extends cc.Assembler {
             }
             letterX = nextLetterX + letterDef.offsetX * _bmfontScale;
 
-            if (letterX + letterDef.w * _bmfontScale > _maxLineWidth
+            if (letterX + (letterDef.xAdvance - letterDef.offsetX) * _bmfontScale > _maxLineWidth
                 && !cc.textUtils.isUnicodeSpace(character)
                 && _maxLineWidth > 0) {
                 return len;
@@ -740,8 +746,8 @@ export default class TmpAssembler extends cc.Assembler {
         this._renderData && (this._renderData.dataLength = 0);
 
         let contentSize = _contentSize,
-            appx = node._anchorPoint.x * contentSize.width,
-            appy = node._anchorPoint.y * contentSize.height;
+            appx = node["_anchorPoint"].x * contentSize.width,
+            appy = node["_anchorPoint"].y * contentSize.height;
 
         let quadsIndex = 0;
         for (let i = 0, l = this._lettersInfo.length; i < l; ++i) {
@@ -972,7 +978,7 @@ export default class TmpAssembler extends cc.Assembler {
             texh = texture.height,
             rectWidth = uvRect.width,
             rectHeight = uvRect.height,
-            color = _comp.node._color._val;
+            color = _comp.node["_color"]._val;
 
         let l, b, r, t;
         let floatsPerVert = this.floatsPerVert;

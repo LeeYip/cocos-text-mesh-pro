@@ -493,6 +493,10 @@ export default class TextMeshPro extends cc.RenderComponent {
     private _worldVertsDirty: boolean = false;
     private _colorExtraDirty: boolean = false;
 
+    private _richTextDeltaX: number = 0;
+    /** 记录letterRight与nextTokenX的差值，供富文本排版使用 */
+    public get richTextDeltaX(): number { return this._richTextDeltaX; }
+
     private editorInit(): void {
         if (CC_EDITOR) {
             // 加载图集
@@ -530,7 +534,7 @@ export default class TextMeshPro extends cc.RenderComponent {
 
     protected resetInEditor(): void {
         if (CC_EDITOR) {
-            TmpUtils.load<cc.Material>("textMeshPro/resources/shader/materials/textMeshPro.mtl").then((mat) => {
+            TmpUtils.load<cc.Material>(TmpUtils.TMP_MAT).then((mat) => {
                 if (mat) {
                     this.setMaterial(0, mat);
                 }

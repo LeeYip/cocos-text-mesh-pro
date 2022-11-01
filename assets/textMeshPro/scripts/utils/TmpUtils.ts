@@ -1,4 +1,7 @@
 export default class TmpUtils {
+    /** TextMeshPro组件默认材质路径 */
+    public static readonly TMP_MAT: string = "textMeshPro/resources/shader/materials/textMeshPro.mtl";
+
     /**
      * 编辑器模式下加载资源
      * @param url db://assets/
@@ -25,6 +28,17 @@ export default class TmpUtils {
                     resolve(result);
                 });
             });
+        });
+    }
+
+    /**
+     * 异步等待 - cc.Component.scheduleOnce
+     */
+    public static waitCmpt(cmpt: cc.Component, seconds: number): Promise<void> {
+        return new Promise((resolve, reject) => {
+            cmpt.scheduleOnce(() => {
+                resolve();
+            }, seconds);
         });
     }
 }
