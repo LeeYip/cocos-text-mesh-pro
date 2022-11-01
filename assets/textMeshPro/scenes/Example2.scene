@@ -243,7 +243,7 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "_string": "富文本测试：\n<size=64>enlarge me</size> <color=#ff0000>Red Text</color> <cg lb=#f90000 rb=#f90000 lt=#0019f7 ​rt=#0019f7>color gradient</cg> <u=8><outline color=green thickness=0.15><face color=#00000000 dilate=0.5 softness=0.01>outline underline strikethrough face</face></outline></u> <s=6>strikethrough</s> <i>This text will be rendered as italic</i> <underlay color=#000000 x=0.001 y=-0.001 dilate=0.5 softness=0.3>underlay</underlay> <glow color=#0ff0ff inner=0.2 outer=0.4><color=#000000>glow</color></glow><img src='question' click='handler' height=40 width=40 align= center/>2222<img src='cancel' click='handler' height=40 width=40 align= center/>",
+    "_string": "富文本测试：\n<size=64>enlarge me</size> <color=#ff0000>Red Text</color> <cg lb=#f90000 rb=#f90000 lt=#0019f7 ​rt=#0019f7>color gradient</cg> <u=8><outline color=green thickness=0.15><face color=#00000000 dilate=0.5 softness=0.02>outline underline strikethrough face</face></outline></u> <s=6>strikethrough</s> <i>This text will be rendered as italic</i> <underlay color=#000000 x=0.001 y=-0.001 dilate=0.5 softness=0.3>underlay</underlay> <glow color=#0ff0ff inner=0.2 outer=0.4><color=#000000>glow</color></glow><img src='question' click='handler' height=40 width=40 align= center/>2222<img src='cancel' click='handler' height=40 width=40 align= center/>",
     "_font": {
       "__uuid__": "8f9b07b2-22f0-4f7f-b969-2cf08cd5b0e1",
       "__expectedType__": "cc.JsonAsset"
