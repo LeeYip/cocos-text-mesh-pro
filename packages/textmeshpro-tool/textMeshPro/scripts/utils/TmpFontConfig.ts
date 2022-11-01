@@ -5,8 +5,8 @@ export interface TmpFontJson {
     size: number;
     bold: number;
     italic: number;
-    padding: string;
-    spacing: string;
+    padding: [number, number, number, number];
+    spacing: [number, number];
     outline: number;
     lineHeight: number;
     base: number;
