@@ -548,7 +548,7 @@ export default class TmpRichText extends cc.Component {
         let spriteFrame = this.imageAtlas.getSpriteFrame(spriteFrameName);
         if (spriteFrame) {
             let spriteNode = new cc.PrivateNode(RichTextChildImageName);
-            // spriteNode._objFlags |= cc.Object.Flags.DontSave;
+            spriteNode["_objFlags"] |= cc.Object["Flags"].DontSave;
             let spriteComponent = spriteNode.addComponent(cc.Sprite);
             switch (richTextElement.style.imageAlign) {
                 case "top":
