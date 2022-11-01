@@ -145,7 +145,7 @@ export class HtmlTextParser {
             tagName = header[0].trim();
             if (tagName.startsWith('img') && tagName[tagName.length - 1] === '/') {
                 header = imageAttrReg.exec(attribute);
-                let tagValue;
+                let tagValue: string;
                 let isValidImageTag = false;
                 while (header) {
                     // skip the invalid tags at first
@@ -223,7 +223,7 @@ export class HtmlTextParser {
             if (attribute) {
                 let colorGradientAttrReg = /(\s)*lb(\s)*=|(\s)*rb(\s)*=|(\s)*lt(\s)*=|(\s)*rt(\s)*=/;
                 header = colorGradientAttrReg.exec(attribute);
-                let tagValue;
+                let tagValue: string;
                 let remainingArgument;
                 while (header) {
                     //skip the invalid tags at first
@@ -264,7 +264,7 @@ export class HtmlTextParser {
             if (attribute) {
                 let faceAttrReg = /(\s)*color(\s)*=|(\s)*dilate(\s)*=|(\s)*softness(\s)*=|(\s)*click(\s)*=|(\s)*param(\s)*=/;
                 header = faceAttrReg.exec(attribute);
-                let tagValue;
+                let tagValue: string;
                 let remainingArgument;
                 while (header) {
                     //skip the invalid tags at first
@@ -287,9 +287,9 @@ export class HtmlTextParser {
                     } else if (tagName === "color") {
                         defaultFaceObject.color = tagValue;
                     } else if (tagName === "dilate") {
-                        defaultFaceObject.dilate = tagValue;
+                        defaultFaceObject.dilate = Number(tagValue);
                     } else if (tagName === "softness") {
-                        defaultFaceObject.softness = tagValue;
+                        defaultFaceObject.softness = Number(tagValue);
                     }
 
                     if (obj.event && tagName === 'param') {
@@ -309,7 +309,7 @@ export class HtmlTextParser {
             if (attribute) {
                 const outlineAttrReg = /(\s)*color(\s)*=|(\s)*thickness(\s)*=|(\s)*click(\s)*=|(\s)*param(\s)*=/;
                 header = outlineAttrReg.exec(attribute);
-                let tagValue;
+                let tagValue: string;
                 while (header) {
                     // skip the invalid tags at first
                     attribute = attribute.substring(attribute.indexOf(header[0]));
@@ -331,7 +331,7 @@ export class HtmlTextParser {
                     } else if (tagName === 'color') {
                         defaultOutlineObject.color = tagValue;
                     } else if (tagName === 'thickness') {
-                        defaultOutlineObject.thickness = tagValue;
+                        defaultOutlineObject.thickness = Number(tagValue);
                     }
 
                     if (obj.event && tagName === 'param') {
@@ -351,7 +351,7 @@ export class HtmlTextParser {
             if (attribute) {
                 let underlayAttrReg = /(\s)*color(\s)*=|(\s)*x(\s)*=|(\s)*y(\s)*=|(\s)*dilate(\s)*=|(\s)*softness(\s)*=|(\s)*click(\s)*=|(\s)*param(\s)*=/;
                 header = underlayAttrReg.exec(attribute);
-                let tagValue;
+                let tagValue: string;
                 let remainingArgument;
                 while (header) {
                     //skip the invalid tags at first
@@ -374,13 +374,13 @@ export class HtmlTextParser {
                     } else if (tagName === "color") {
                         defaultUnderlayObject.color = tagValue;
                     } else if (tagName === "dilate") {
-                        defaultUnderlayObject.dilate = tagValue;
+                        defaultUnderlayObject.dilate = Number(tagValue);
                     } else if (tagName === "softness") {
-                        defaultUnderlayObject.softness = tagValue;
+                        defaultUnderlayObject.softness = Number(tagValue);
                     } else if (tagName === "x") {
-                        defaultUnderlayObject.x = tagValue;
+                        defaultUnderlayObject.x = Number(tagValue);
                     } else if (tagName === "y") {
-                        defaultUnderlayObject.y = tagValue;
+                        defaultUnderlayObject.y = Number(tagValue);
                     }
 
                     if (obj.event && tagName === 'param') {
@@ -400,7 +400,7 @@ export class HtmlTextParser {
             if (attribute) {
                 let glowAttrReg = /(\s)*color(\s)*=|(\s)*offset(\s)*=|(\s)*inner(\s)*=|(\s)*outer(\s)*=|(\s)*power(\s)*=|(\s)*click(\s)*=|(\s)*param(\s)*=/;
                 header = glowAttrReg.exec(attribute);
-                let tagValue;
+                let tagValue: string;
                 let remainingArgument;
                 while (header) {
                     //skip the invalid tags at first
@@ -423,13 +423,13 @@ export class HtmlTextParser {
                     } else if (tagName === "color") {
                         defaultGlowObject.color = tagValue;
                     } else if (tagName === "offset") {
-                        defaultGlowObject.offset = tagValue;
+                        defaultGlowObject.offset = Number(tagValue);
                     } else if (tagName === "inner") {
-                        defaultGlowObject.inner = tagValue;
+                        defaultGlowObject.inner = Number(tagValue);
                     } else if (tagName === "outer") {
-                        defaultGlowObject.outer = tagValue;
+                        defaultGlowObject.outer = Number(tagValue);
                     } else if (tagName === "power") {
-                        defaultGlowObject.power = tagValue;
+                        defaultGlowObject.power = Number(tagValue);
                     }
 
                     if (obj.event && tagName === 'param') {
