@@ -1,10 +1,11 @@
 import { Component, tween, Vec3, _decorator } from "cc";
 import TextMeshPro from "./TextMeshPro";
+import TmpUtils from "./utils/TmpUtils";
 
 const { ccclass, property } = _decorator;
 
 @ccclass
-export default class Main extends Component {
+export default class Example1 extends Component {
 
     @property(TextMeshPro)
     text1: TextMeshPro = null;
@@ -36,7 +37,7 @@ export default class Main extends Component {
     public _fScale: number = 1;
     public _xOffset: number = 0;
     private async anim1(): Promise<void> {
-        await this.waitCmpt(this, 1);
+        await TmpUtils.waitCmpt(this, 1);
         this.text1.string = "这 是 一 段 测 试 文 字aaagghjsa;dzxmc;";
         this.text1.updateRenderData(true);
         for (let i = 0; i < this.text1.string.length; i++) {
@@ -68,11 +69,11 @@ export default class Main extends Component {
                 this.text1.setPosVertices(i, copy as any);
             }
 
-            tween<Main>(this)
+            tween<Example1>(this)
                 .to(0.05, { _fScale: 2, _xOffset: -15 }, { onUpdate: updateCall })
                 .to(0.05, { _fScale: 1, _xOffset: 0 }, { onUpdate: updateCall })
                 .start();
-            await this.waitCmpt(this, 0.1);
+            await TmpUtils.waitCmpt(this, 0.1);
         }
     }
 
@@ -96,7 +97,7 @@ export default class Main extends Component {
 
     public alpha: number = 0;
     private async anim3(): Promise<void> {
-        await this.waitCmpt(this, 1);
+        await TmpUtils.waitCmpt(this, 1);
         this.text3.string = "这 是 一 段 测 试 文 字aaagghjsa;dzxmc;";
         this.text3.updateRenderData(true);
         for (let i = 0; i < this.text3.string.length; i++) {
@@ -111,7 +112,7 @@ export default class Main extends Component {
             this.text3.setVisible(i, false);
             let result = this.text3.getColorExtraVertices(i);
             this.alpha = 0;
-            tween<Main>(this)
+            tween<Example1>(this)
                 .to(time / 2, { alpha: 255 }, {
                     onUpdate: () => {
                         result[0].a = this.alpha;
@@ -131,18 +132,7 @@ export default class Main extends Component {
                 })
                 .start();
 
-            await this.waitCmpt(this, time);
+            await TmpUtils.waitCmpt(this, time);
         }
-    }
-
-    /**
-     * 异步等待 - cc.Component.scheduleOnce
-     */
-    public waitCmpt(cmpt: Component, seconds: number): Promise<void> {
-        return new Promise((resolve, reject) => {
-            cmpt.scheduleOnce(() => {
-                resolve();
-            }, seconds);
-        });
     }
 }

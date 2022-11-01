@@ -526,6 +526,10 @@ export default class TextMeshPro extends UIRenderer {
     protected _assembler: typeof TmpAssembler = null;
     private _colorExtraDirty: boolean = false;
 
+    private _richTextDeltaX: number = 0;
+    /** 记录letterRight与nextTokenX的差值，供富文本排版使用 */
+    public get richTextDeltaX(): number { return this._richTextDeltaX; }
+
     private editorInit(): void {
         if (EDITOR) {
             // 加载图集
@@ -565,7 +569,7 @@ export default class TextMeshPro extends UIRenderer {
 
     public resetInEditor(): void {
         if (EDITOR) {
-            TmpUtils.load<Material>("textMeshPro/resources/shader/materials/textMeshPro.mtl").then((mat) => {
+            TmpUtils.load<Material>(TmpUtils.TMP_MAT).then((mat) => {
                 if (mat) {
                     this.customMaterial = mat;
                 }

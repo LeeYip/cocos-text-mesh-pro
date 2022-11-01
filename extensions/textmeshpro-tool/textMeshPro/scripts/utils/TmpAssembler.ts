@@ -1,4 +1,4 @@
-import { Color, HorizontalTextAlignment, log, Mat4, misc, Rect, rect, RenderData, size, SpriteFrame, Texture2D, UITransform, v2, Vec2, Vec3, VerticalTextAlignment } from "cc";
+import { Color, HorizontalTextAlignment, log, Mat4, misc, Rect, rect, size, UITransform, v2, Vec2, Vec3, VerticalTextAlignment } from "cc";
 import { JSB } from "cc/env";
 import TextMeshPro, { TmpOverflow } from "../TextMeshPro";
 import TmpFontConfig, { TmpFontLetter } from "./TmpFontConfig";
@@ -31,7 +31,7 @@ let shareLabelInfo = {
     margin: 0,
 };
 
-let _comp = null;
+let _comp: TextMeshPro = null;
 let _uiTrans: UITransform | null = null;
 let _tmpUvRect = rect();
 let _tmpPosRect = rect();
@@ -171,7 +171,7 @@ export default class TmpAssembler {
             this.updateColor(comp);
             this.updateTextureIdx(comp);
 
-            _comp._actualFontSize = _fontSize;
+            _comp["_actualFontSize"] = _fontSize;
             _uiTrans.setContentSize(_contentSize);
 
             _comp.renderData!.vertDirty = false;
@@ -430,7 +430,8 @@ export default class TmpAssembler {
                     useEllipsis = true;
                     // 更新_linesWidth
                     let ellipsisInfo = _comp.lettersInfo[_comp.lettersInfo.length - 1];
-                    letterRight = ellipsisInfo.x + _ellipsisDef.w * _bmfontScale - shareLabelInfo.margin;
+                    // letterRight = ellipsisInfo.x + (_ellipsisDef.w) * _bmfontScale - shareLabelInfo.margin;
+                    letterRight = ellipsisInfo.x + (_ellipsisDef.xAdvance - _ellipsisDef.offsetX) * _bmfontScale + _spacingX - shareLabelInfo.margin * 2;
                     break;
                 }
 
@@ -477,13 +478,14 @@ export default class TmpAssembler {
 
                 // 省略号处理
                 if (_overflow === TmpOverflow.ELLIPSIS && _ellipsisDef) {
-                    if (letterX + letterDef.w * _bmfontScale > _maxLineWidth) {
+                    if (letterX + (letterDef.xAdvance - letterDef.offsetX) * _bmfontScale > _maxLineWidth) {
                         if (!_isWrapText || lineIndex + 1 >= ellipsisMaxLines) {
                             this._recordEllipsis(nextTokenY, letterPosition, lineIndex);
                             useEllipsis = true;
                             // 更新_linesWidth
                             let ellipsisInfo = _comp.lettersInfo[_comp.lettersInfo.length - 1];
-                            letterRight = ellipsisInfo.x + _ellipsisDef.w * _bmfontScale - shareLabelInfo.margin;
+                            // letterRight = ellipsisInfo.x + (_ellipsisDef.w) * _bmfontScale - shareLabelInfo.margin;
+                            letterRight = ellipsisInfo.x + (_ellipsisDef.xAdvance - _ellipsisDef.offsetX) * _bmfontScale + _spacingX - shareLabelInfo.margin * 2;
                             break;
                         }
                     }
@@ -492,7 +494,7 @@ export default class TmpAssembler {
                 if (_isWrapText
                     && _maxLineWidth > 0
                     && nextTokenX > 0
-                    && letterX + letterDef.w * _bmfontScale > _maxLineWidth
+                    && letterX + (letterDef.xAdvance - letterDef.offsetX) * _bmfontScale > _maxLineWidth
                     && !TmpUtils.isUnicodeSpace(character)) {
                     _linesWidth.push(letterRight);
                     letterRight = 0;
@@ -514,7 +516,7 @@ export default class TmpAssembler {
 
                 nextLetterX += letterDef.xAdvance * _bmfontScale + _spacingX - shareLabelInfo.margin * 2;
 
-                tokenRight = letterPosition.x + letterDef.w * _bmfontScale - shareLabelInfo.margin;
+                tokenRight = nextLetterX; //letterPosition.x + letterDef.w * _bmfontScale - shareLabelInfo.margin;
                 // 斜边处理
                 if ((_comp as TextMeshPro).enableItalic) {
                     _italicVec.x = 0;
@@ -583,6 +585,9 @@ export default class TmpAssembler {
             }
         }
 
+        // 记录letterRight与nextTokenX的差值，供富文本排版使用
+        _comp["_richTextDeltaX"] = nextTokenX - letterRight;
+
         return true;
     }
 
@@ -618,7 +623,7 @@ export default class TmpAssembler {
             }
             letterX = nextLetterX + letterDef.offsetX * _bmfontScale;
 
-            if (letterX + letterDef.w * _bmfontScale > _maxLineWidth
+            if (letterX + (letterDef.xAdvance - letterDef.offsetX) * _bmfontScale > _maxLineWidth
                 && !TmpUtils.isUnicodeSpace(character)
                 && _maxLineWidth > 0) {
                 return len;
@@ -1059,6 +1064,9 @@ export default class TmpAssembler {
                 }
                 let alpha = info.visible ? 1 : 0;
                 let offset = info.quadsIndex * 4;
+                if (dataList.length < offset + 4) {
+                    break;
+                }
 
                 tempColor.set(WHITE);
                 tempColor.a *= alpha;
@@ -1094,6 +1102,9 @@ export default class TmpAssembler {
                     let info = comp.lettersInfo[letterIndex];
                     let alpha = info.visible ? 1 : 0;
                     let offset = i * 4;
+                    if (dataList.length < offset + 4) {
+                        break;
+                    }
 
                     tempColor.set(WHITE);
                     tempColor.a *= alpha;
