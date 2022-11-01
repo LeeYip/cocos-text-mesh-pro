@@ -22592,7 +22592,7 @@ declare namespace cc.js {
 		!#en Put an object into the pool.
 		!#zh 向对象池返还一个不再需要的对象。 
 		*/
-		put(): void;
+		put(obj: any): void;
 		/**
 		!#en Resize the pool.
 		!#zh 设置对象池容量。 
