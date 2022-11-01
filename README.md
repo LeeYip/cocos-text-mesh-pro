@@ -10,6 +10,7 @@
     - [组件](#component)
     - [API](#api)
     - [Example](#example)
+- [富文本](#richtext)
 - [注意事项](#note)
 
 ## <a id="preface"></a>前言
@@ -26,6 +27,7 @@
 - 支持描边、镂空、阴影、辉光等特效，且这些特效会作用在下划线与删除线上
 - 提供顶点数据接口，可以自由实现顶点动画
 - 提供新的排版模式ELLIPSIS——当文本超出节点大小时，自动以"..."结尾
+- 支持富文本
 
 ![image](./docs/images/showcase1.gif)</br>
 
@@ -60,7 +62,7 @@ Font Tool界面如上图所示
 - 导出文本：可选择导出输入框内的文本或者导出txt文件内的文本
 - 字体参数：Font Size为字体导出大小，Padding为字体间距，这两个参数大一些会对渲染效果好一点，但过大可能会导致导出的纹理数量过多，注意不可超出纹理上限
 - 纹理参数：导出的纹理大小
-- SDF Scale：此参数越大对最终渲染效果越好，但过大会导致字体导出过于缓慢。原理是导出字体前先对所有字体进行此值的放大，然后再生成SDF纹理，再将字体缩小为导出的Font Size进行导出。
+- SDF Scale：此参数越大对最终渲染效果越好，但过大会导致字体导出过于缓慢。原理是导出字体前先对所有字体进行放大，然后再生成SDF纹理，再将字体纹理缩小为导出的Font Size进行导出。
 - Save：保存插件配置
 - Export：导出字体，生成运行时所需的json和png。期间会用命令行自动打开Hiero工具，导出过程根据设置的参数可能会非常缓慢，请耐心等待Hiero自行关闭。
 
@@ -233,6 +235,30 @@ Font Tool界面如上图所示
         }
     }
     ```
+
+## <a id="richtext"></a>富文本
+![image](./docs/images/richtext.png)</br>
+如需使用富文本请使用TmpRichText组件，除粗体标签外支持全部Cocos的RichText组件的标签，且拓展支持了所有TextMeshPro具备的效果。
+
+复杂文本情况下draw call会少于Cocos的RichText组件，并且效果更丰富。
+
+**支持标签**
+| 名称 | 描述 | 示例 | 注意事项 |
+| :-: | :-: | :-: | :-: |
+| size | 字体渲染大小，大小值必须是一个整数 | \<size=30\>enlarge me\</size\> | Size值必须使用等号赋值 |
+| color | 字体顶点颜色，颜色值可以是内置颜色，比如 white、black 等，也可以使用 16 进制颜色值，比如 #ff0000 表示红色 | \<color=#ff0000\>Red Text\</color\> |  |
+| cg | 启用字体颜色渐变，指定四个顶点的额外颜色，会与顶点色混合 | \<cg lb=#f90000 rb=#f90000 lt=#0019f7 ​rt=#0019f7\>color gradient\</cg\> | 默认值参考TextMeshPro组件 |
+| face | 文本主体颜色、厚度、柔和度 | \<face color=#f00000 dilate=0.5 softness=0.01\>face\</face\> | 默认值和取值范围请参考TextMeshPro组件face相关属性 |
+| i | 斜体 | \<i\>This text will be rendered as italic\</i\> |  |
+| u | 启用下划线，可指定下划线的偏移 | \<u=8\>This text will have a underline\</u\> | 等号后面的值即下划线偏移值，默认值参考TextMeshPro组件underline相关属性 |
+| s | 启用删除线，可指定删除线的偏移  | \<s=8\>This text will have a strikethrough\</s\> | 等号后面的值即删除线偏移值，默认值参考TextMeshPro组件strikethrough相关属性 |
+| outline | 字体的描边颜色和描边宽度 | \<outline color=red thickness=0.15\>A label with outline\</outline\> | 默认值和取值范围请参考TextMeshPro组件outline相关属性 |
+| underlay | 字体的阴影颜色、偏移、厚度、柔和度 | \<underlay color=#00ff00 x=0.001 y=-0.001 dilate=0.5 softness=0.3\>underlay\</underlay\> | 默认值和取值范围请参考TextMeshPro组件underlay相关属性 |
+| glow | 字体辉光效果颜色、偏移、厚度 | \<glow color=#0ff0ff inner=0.2 outer=0.4\>\<color=#000000\>glow\</color\>\</glow\> | 默认值和取值范围请参考TextMeshPro组件glow相关属性 |
+| on | 指定一个点击事件处理函数，当点击该 Tag 所在文本内容时，会调用该事件响应函数 | \<on click="handler"\> click me! \</on\> | 除了 on 标签可以添加 click 属性，color 和 size 标签也可以添加，比如 \<size=10 click="handler2"\>click me\</size\> |
+| param | 当点击事件触发时，可以在回调函数的第二个参数获取该数值 | \<on click="handler" param="test"\> click me! \</on\> | 依赖 click 事件 |
+| br | 插入一个空行 | \<br/\> | 注意：\<br\>\</br\> 和 \<br\> 都是不支持的。 |
+| img | 给富文本添加图文混排功能，img 的 src 属性必须是 ImageAtlas 图集里面的一个有效的 spriteframe 名称 | \<img src='emoji1' click='handler' height=50 width=50 align=center /\> | 规则与Cocos的RichText组件一致 |
 
 ## <a id="note"></a>注意事项
 - 切勿将字体纹理打入图集中
