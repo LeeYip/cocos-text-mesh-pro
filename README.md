@@ -238,9 +238,10 @@ Font Tool界面如上图所示
 
 ## <a id="richtext"></a>富文本
 ![image](./docs/images/richtext.png)</br>
-如需使用富文本请使用TmpRichText组件，除粗体标签外支持全部Cocos的RichText组件的标签，且拓展支持了所有TextMeshPro具备的效果。
+如需使用富文本请使用**TmpRichText**组件，除粗体标签外支持全部Cocos的RichText组件的标签，且拓展支持了所有TextMeshPro具备的效果。
 
-复杂文本情况下draw call会少于Cocos的RichText组件，并且效果更丰富。
+- 复杂文本情况下draw call会少于Cocos的RichText组件
+- 内部对图片节点与文本节点做了分层处理，进一步减少了draw call
 
 **支持标签**
 | 名称 | 描述 | 示例 | 注意事项 |
