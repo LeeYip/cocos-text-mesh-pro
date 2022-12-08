@@ -2,7 +2,7 @@ import TmpAssembler from "./utils/TmpAssembler";
 import TmpFontConfig from "./utils/TmpFontConfig";
 import TmpUtils from "./utils/TmpUtils";
 
-const { ccclass, property, executeInEditMode } = cc._decorator;
+const { ccclass, property, executeInEditMode, menu } = cc._decorator;
 
 /**
  * TextMeshPro的排版方式
@@ -268,6 +268,7 @@ export class TmpUniform {
 
 @ccclass
 @executeInEditMode
+@menu("TextMeshPro组件/TextMeshPro")
 export default class TextMeshPro extends cc.RenderComponent {
 
     @property
@@ -277,7 +278,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     public set string(v: string) {
         if (this._string === v) { return; }
         this._string = v;
-        this.setVertsDirty();
+        this["setVertsDirty"]();
         this._checkStringEmpty();
     }
 
@@ -303,7 +304,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     public set horizontalAlign(v: cc.Label.HorizontalAlign) {
         if (this._horizontalAlign === v) { return; }
         this._horizontalAlign = v;
-        this.setVertsDirty();
+        this["setVertsDirty"]();
     }
 
     @property({ type: cc.Label.VerticalAlign })
@@ -313,7 +314,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     public set verticalAlign(v: cc.Label.VerticalAlign) {
         if (this._verticalAlign === v) { return; }
         this._verticalAlign = v;
-        this.setVertsDirty();
+        this["setVertsDirty"]();
     }
 
     @property
@@ -331,7 +332,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     public set fontSize(v: number) {
         if (this._fontSize === v) { return; }
         this._fontSize = v;
-        this.setVertsDirty();
+        this["setVertsDirty"]();
     }
 
     @property
@@ -341,7 +342,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     public set lineHeight(v: number) {
         if (this._lineHeight === v) { return; }
         this._lineHeight = v;
-        this.setVertsDirty();
+        this["setVertsDirty"]();
     }
 
     @property
@@ -351,7 +352,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     public set spacingX(v: number) {
         if (this._spacingX === v) { return; }
         this._spacingX = v;
-        this.setVertsDirty();
+        this["setVertsDirty"]();
     }
 
     @property({ type: cc.Enum(TmpOverflow) })
@@ -361,7 +362,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     public set overflow(v: TmpOverflow) {
         if (this._overflow === v) { return; }
         this._overflow = v;
-        this.setVertsDirty();
+        this["setVertsDirty"]();
     }
 
     @property
@@ -376,7 +377,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     public set enableWrapText(v: boolean) {
         if (this._enableWrapText === v) { return; }
         this._enableWrapText = v;
-        this.setVertsDirty();
+        this["setVertsDirty"]();
     }
 
     @property
@@ -386,7 +387,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     public set enableItalic(v: boolean) {
         if (this._enableItalic === v) { return; }
         this._enableItalic = v;
-        this.setVertsDirty();
+        this["setVertsDirty"]();
     }
 
     @property
@@ -396,7 +397,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     public set enableUnderline(v: boolean) {
         if (this._enableUnderline === v) { return; }
         this._enableUnderline = v;
-        this.setVertsDirty();
+        this["setVertsDirty"]();
     }
 
     @property
@@ -406,7 +407,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     public set underlineOffset(v: number) {
         if (this._underlineOffset === v) { return; }
         this._underlineOffset = v;
-        this.setVertsDirty();
+        this["setVertsDirty"]();
     }
 
     @property
@@ -416,7 +417,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     public set enableStrikethrough(v: boolean) {
         if (this._enableStrikethrough === v) { return; }
         this._enableStrikethrough = v;
-        this.setVertsDirty();
+        this["setVertsDirty"]();
     }
 
     @property
@@ -426,7 +427,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     public set strikethroughOffset(v: number) {
         if (this._strikethroughOffset === v) { return; }
         this._strikethroughOffset = v;
-        this.setVertsDirty();
+        this["setVertsDirty"]();
     }
 
     @property
@@ -553,7 +554,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     protected onEnable(): void {
         super.onEnable();
         this.node.on(cc.Node.EventType.SIZE_CHANGED, this._nodeSizeChanged, this);
-        this.node.on(cc.Node.EventType.ANCHOR_CHANGED, this.setVertsDirty, this);
+        this.node.on(cc.Node.EventType.ANCHOR_CHANGED, this["setVertsDirty"], this);
 
         this.forceUpdateRenderData();
     }
@@ -561,7 +562,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     protected onDisable(): void {
         super.onDisable();
         this.node.off(cc.Node.EventType.SIZE_CHANGED, this._nodeSizeChanged, this);
-        this.node.off(cc.Node.EventType.ANCHOR_CHANGED, this.setVertsDirty, this);
+        this.node.off(cc.Node.EventType.ANCHOR_CHANGED, this["setVertsDirty"], this);
     }
 
     protected lateUpdate(dt: number): void {
@@ -579,13 +580,13 @@ export default class TextMeshPro extends cc.RenderComponent {
         // Because the content size is automatically updated when overflow is NONE.
         // And this will conflict with the alignment of the CCWidget.
         if (CC_EDITOR || this.overflow !== TmpOverflow.NONE) {
-            this.setVertsDirty();
+            this["setVertsDirty"]();
         }
     }
 
     private _validateRender(): void {
         if (!this.string) {
-            this.disableRender();
+            this["disableRender"]();
             return;
         }
 
@@ -594,7 +595,7 @@ export default class TextMeshPro extends cc.RenderComponent {
                 return;
             }
         }
-        this.disableRender();
+        this["disableRender"]();
     }
 
     protected _resetAssembler(): void {
@@ -602,7 +603,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     }
 
     private _checkStringEmpty(): void {
-        this.markForRender(!!this.string);
+        this["markForRender"](!!this.string);
     }
 
     private _on3DNodeChanged(): void {
@@ -611,7 +612,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     }
 
     private _onBMFontTextureLoaded(): void {
-        this.markForRender(true);
+        this["markForRender"](true);
         this._updateMaterial();
     }
 
@@ -622,7 +623,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     }
 
     private _applyFontTexture(): void {
-        this.markForValidate();
+        this["markForValidate"]();
     }
 
     private _updateMaterial(): void {
@@ -714,7 +715,7 @@ export default class TextMeshPro extends cc.RenderComponent {
      * 立即更新渲染数据
      */
     public forceUpdateRenderData(): void {
-        this.setVertsDirty();
+        this["setVertsDirty"]();
         this._resetAssembler();
         this._applyFontTexture();
         this._assembler && this._assembler.updateRenderData(this);
@@ -790,7 +791,7 @@ export default class TextMeshPro extends cc.RenderComponent {
     //#endregion
 }
 
-cc.Assembler.register(TextMeshPro, {
+cc["Assembler"].register(TextMeshPro, {
     getConstructor(comp: TextMeshPro) {
         return TmpAssembler;
     }

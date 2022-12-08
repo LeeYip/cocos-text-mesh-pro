@@ -95,7 +95,7 @@ class LetterInfo {
 /**
  * TextMeshPro顶点数据管理
  */
-export default class TmpAssembler extends cc.Assembler {
+export default class TmpAssembler extends cc["Assembler"] {
     /** 每个顶点的数据长度 */
     protected floatsPerVert: number = 7;
     protected verticesCount: number = 4;
@@ -191,7 +191,7 @@ export default class TmpAssembler extends cc.Assembler {
      * 执行一次渲染数据更新
      */
     public updateRenderData(comp: TextMeshPro): void {
-        if (!comp._vertsDirty) { return; }
+        if (!comp["_vertsDirty"]) { return; }
         if (_comp === comp) { return; }
         if (!comp.fontConfig) { return; }
 
@@ -205,7 +205,7 @@ export default class TmpAssembler extends cc.Assembler {
         _comp["_actualFontSize"] = _fontSize;
         _comp.node.setContentSize(_contentSize);
 
-        _comp._vertsDirty = false;
+        _comp["_vertsDirty"] = false;
         _comp = null;
         this._resetProperties();
     }
@@ -468,7 +468,7 @@ export default class TmpAssembler extends cc.Assembler {
                     && _maxLineWidth > 0
                     && nextTokenX > 0
                     && letterX + (letterDef.xAdvance - letterDef.offsetX) * _bmfontScale > _maxLineWidth
-                    && !cc.textUtils.isUnicodeSpace(character)) {
+                    && !cc["textUtils"].isUnicodeSpace(character)) {
                     _linesWidth.push(letterRight);
                     letterRight = 0;
                     lineIndex++;
@@ -575,9 +575,9 @@ export default class TmpAssembler extends cc.Assembler {
 
     private _getFirstWordLen(text: string, startIndex: number, textLen: number): number {
         let character = text.charAt(startIndex);
-        if (cc.textUtils.isUnicodeCJK(character)
+        if (cc["textUtils"].isUnicodeCJK(character)
             || character === "\n"
-            || cc.textUtils.isUnicodeSpace(character)) {
+            || cc["textUtils"].isUnicodeSpace(character)) {
             return 1;
         }
 
@@ -598,14 +598,14 @@ export default class TmpAssembler extends cc.Assembler {
             letterX = nextLetterX + letterDef.offsetX * _bmfontScale;
 
             if (letterX + (letterDef.xAdvance - letterDef.offsetX) * _bmfontScale > _maxLineWidth
-                && !cc.textUtils.isUnicodeSpace(character)
+                && !cc["textUtils"].isUnicodeSpace(character)
                 && _maxLineWidth > 0) {
                 return len;
             }
             nextLetterX += letterDef.xAdvance * _bmfontScale + _spacingX;
             if (character === "\n"
-                || cc.textUtils.isUnicodeSpace(character)
-                || cc.textUtils.isUnicodeCJK(character)) {
+                || cc["textUtils"].isUnicodeSpace(character)
+                || cc["textUtils"].isUnicodeCJK(character)) {
                 break;
             }
             len++;
@@ -683,17 +683,17 @@ export default class TmpAssembler extends cc.Assembler {
         _linesOffsetX.length = 0;
 
         switch (_hAlign) {
-            case cc.macro.TextAlignment.LEFT:
+            case cc.Label.HorizontalAlign.LEFT:
                 for (let i = 0; i < _numberOfLines; ++i) {
                     _linesOffsetX.push(0);
                 }
                 break;
-            case cc.macro.TextAlignment.CENTER:
+            case cc.Label.HorizontalAlign.CENTER:
                 for (let i = 0, l = _linesWidth.length; i < l; i++) {
                     _linesOffsetX.push((_contentSize.width - _linesWidth[i]) / 2);
                 }
                 break;
-            case cc.macro.TextAlignment.RIGHT:
+            case cc.Label.HorizontalAlign.RIGHT:
                 for (let i = 0, l = _linesWidth.length; i < l; i++) {
                     _linesOffsetX.push(_contentSize.width - _linesWidth[i]);
                 }
@@ -704,9 +704,9 @@ export default class TmpAssembler extends cc.Assembler {
 
         // TOP
         _letterOffsetY = _contentSize.height;
-        if (_vAlign !== cc.macro.VerticalTextAlignment.TOP) {
+        if (_vAlign !== cc.Label.VerticalAlign.TOP) {
             let blank = _contentSize.height - _textDesiredHeight + _lineHeight * this._getFontScale() - _originFontSize * _bmfontScale;
-            if (_vAlign === cc.macro.VerticalTextAlignment.BOTTOM) {
+            if (_vAlign === cc.Label.VerticalAlign.BOTTOM) {
                 // BOTTOM
                 _letterOffsetY -= blank;
             } else {
@@ -804,7 +804,7 @@ export default class TmpAssembler extends cc.Assembler {
                 quadsIndex++;
                 // 下划线数据记录
                 if (_extraLineDef && ((_comp as TextMeshPro).enableUnderline || (_comp as TextMeshPro).enableStrikethrough)) {
-                    if (!cc.textUtils.isUnicodeSpace(letterInfo.char)) {
+                    if (!cc["textUtils"].isUnicodeSpace(letterInfo.char)) {
                         let lineData = _extraLinesData[letterInfo.line];
                         if (!lineData) {
                             _extraLinesData[letterInfo.line] = {
@@ -1018,7 +1018,7 @@ export default class TmpAssembler extends cc.Assembler {
         // colorExtra
         let colorExtraOffset = _dataOffset + this.colorExtraOffset;
         for (let i = 0; i < 4; i++) {
-            uintVerts[colorExtraOffset] = WHITE._val;
+            uintVerts[colorExtraOffset] = WHITE["_val"];
             colorExtraOffset += floatsPerVert;
         }
 
@@ -1104,7 +1104,7 @@ export default class TmpAssembler extends cc.Assembler {
 
     public updateColor(comp, color?): void {
         if (CC_NATIVERENDERER) {
-            this["_dirtyPtr"][0] |= cc.Assembler["FLAG_VERTICES_OPACITY_CHANGED"];
+            this["_dirtyPtr"][0] |= cc["Assembler"]["FLAG_VERTICES_OPACITY_CHANGED"];
         }
         let uintVerts = this._renderData.uintVDatas[0];
         if (!uintVerts) return;
@@ -1126,7 +1126,7 @@ export default class TmpAssembler extends cc.Assembler {
         let tmpColor = cc.color();
         for (let i = 0; i < this._lettersInfo.length; i++) {
             let info = this._lettersInfo[i];
-            if (!info.valid || cc.textUtils.isUnicodeSpace(info.char)) {
+            if (!info.valid || cc["textUtils"].isUnicodeSpace(info.char)) {
                 continue;
             }
             let alpha = info.visible ? 1 : 0;
@@ -1134,25 +1134,25 @@ export default class TmpAssembler extends cc.Assembler {
             tmpColor.set(WHITE);
             tmpColor.setA(tmpColor.a * alpha);
             comp.colorGradient && tmpColor.multiply(comp.colorLB);
-            uintVerts[offset] = tmpColor._val;
+            uintVerts[offset] = tmpColor["_val"];
 
             offset += this.floatsPerVert;
             tmpColor.set(WHITE);
             tmpColor.setA(tmpColor.a * alpha);
             comp.colorGradient && tmpColor.multiply(comp.colorRB);
-            uintVerts[offset] = tmpColor._val;
+            uintVerts[offset] = tmpColor["_val"];
 
             offset += this.floatsPerVert;
             tmpColor.set(WHITE);
             tmpColor.setA(tmpColor.a * alpha);
             comp.colorGradient && tmpColor.multiply(comp.colorLT);
-            uintVerts[offset] = tmpColor._val;
+            uintVerts[offset] = tmpColor["_val"];
 
             offset += this.floatsPerVert;
             tmpColor.set(WHITE);
             tmpColor.setA(tmpColor.a * alpha);
             comp.colorGradient && tmpColor.multiply(comp.colorRT);
-            uintVerts[offset] = tmpColor._val;
+            uintVerts[offset] = tmpColor["_val"];
         }
     }
 
@@ -1163,7 +1163,7 @@ export default class TmpAssembler extends cc.Assembler {
      */
     public isVisble(index: number): boolean {
         let info = this._lettersInfo[index];
-        return info && info.valid && info.visible && !cc.textUtils.isUnicodeSpace(info.char);
+        return info && info.valid && info.visible && !cc["textUtils"].isUnicodeSpace(info.char);
     }
 
     /**
@@ -1171,7 +1171,7 @@ export default class TmpAssembler extends cc.Assembler {
      */
     public setVisible(comp: TextMeshPro, index: number, visible: boolean): void {
         let info = this._lettersInfo[index];
-        if (!info || this.isVisble(index) === visible || info.visible === visible || cc.textUtils.isUnicodeSpace(info.char)) {
+        if (!info || this.isVisble(index) === visible || info.visible === visible || cc["textUtils"].isUnicodeSpace(info.char)) {
             return;
         }
 
@@ -1219,7 +1219,7 @@ export default class TmpAssembler extends cc.Assembler {
         let offset = this.colorExtraOffset + this.floatsPerVert * info.quadsIndex * 4;
         for (let i = 0; i < 4; i++) {
             let color = cc.color();
-            color._val = uintVerts[offset];
+            color["_val"] = uintVerts[offset];
             result.push(color);
             offset += this.floatsPerVert;
         }
@@ -1231,14 +1231,14 @@ export default class TmpAssembler extends cc.Assembler {
      */
     public setColorExtraVertices(index: number, data: [cc.Color, cc.Color, cc.Color, cc.Color]): void {
         let info = this._lettersInfo[index];
-        if (!info || !info.valid || data.length !== 4 || cc.textUtils.isUnicodeSpace(info.char)) {
+        if (!info || !info.valid || data.length !== 4 || cc["textUtils"].isUnicodeSpace(info.char)) {
             return;
         }
 
         let uintVerts = this._renderData.uintVDatas[0];
         let offset = this.colorExtraOffset + this.floatsPerVert * info.quadsIndex * 4;
         for (let i = 0; i < 4; i++) {
-            uintVerts[offset] = data[i]._val;
+            uintVerts[offset] = data[i]["_val"];
             offset += this.floatsPerVert;
         }
     }
@@ -1266,7 +1266,7 @@ export default class TmpAssembler extends cc.Assembler {
      */
     public setPosVertices(index: number, data: [cc.Vec2, cc.Vec2, cc.Vec2, cc.Vec2]): void {
         let info = this._lettersInfo[index];
-        if (!info || !info.valid || data.length !== 4 || cc.textUtils.isUnicodeSpace(info.char)) {
+        if (!info || !info.valid || data.length !== 4 || cc["textUtils"].isUnicodeSpace(info.char)) {
             return;
         }
         let local = this._local;

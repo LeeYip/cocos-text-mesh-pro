@@ -2,7 +2,7 @@ import TextMeshPro from "./TextMeshPro";
 import { HtmlTextParser } from "./utils/HtmlParser";
 import TmpUtils from "./utils/TmpUtils";
 
-const { ccclass, property, disallowMultiple, executeInEditMode } = cc._decorator;
+const { ccclass, property, disallowMultiple, executeInEditMode, menu } = cc._decorator;
 
 const RichTextChildName = "RICHTEXT_CHILD";
 const RichTextChildImageName = "RICHTEXT_Image_CHILD";
@@ -50,6 +50,7 @@ pool.get = function (string: string, richtext: TmpRichText) {
 @ccclass
 @disallowMultiple
 @executeInEditMode
+@menu("TextMeshPro组件/TmpRichText")
 export default class TmpRichText extends cc.Component {
 
     @property
@@ -266,6 +267,7 @@ export default class TmpRichText extends cc.Component {
     protected onDestroy(): void {
         for (let i = 0; i < this._labelSegments.length; ++i) {
             this._labelSegments[i].removeFromParent();
+            // @ts-ignore
             pool.put(this._labelSegments[i]);
         }
     }
@@ -371,6 +373,7 @@ export default class TmpRichText extends cc.Component {
                     children.splice(i, 1);
                 }
                 if (child.name === RichTextChildName) {
+                    // @ts-ignore
                     pool.put(child);
                 }
             }
@@ -460,7 +463,7 @@ export default class TmpRichText extends cc.Component {
             }
         }
         if (fragmentWidth > this.maxWidth) {
-            let fragments = cc.textUtils.fragmentText(labelString,
+            let fragments = cc["textUtils"].fragmentText(labelString,
                 fragmentWidth,
                 this.maxWidth,
                 this._measureText(styleIndex));
@@ -701,7 +704,7 @@ export default class TmpRichText extends cc.Component {
         if (this.maxWidth > 0) {
             this._labelWidth = this.maxWidth;
         }
-        this._labelHeight = (this._lineCount + cc.textUtils.BASELINE_RATIO) * this.lineHeight;
+        this._labelHeight = (this._lineCount + cc["textUtils"].BASELINE_RATIO) * this.lineHeight;
 
         // trigger "size-changed" event
         this.node.setContentSize(this._labelWidth, this._labelHeight);
@@ -712,16 +715,16 @@ export default class TmpRichText extends cc.Component {
 
     private _getFirstWordLen(text, startIndex, textLen): number {
         let character = text.charAt(startIndex);
-        if (cc.textUtils.isUnicodeCJK(character)
-            || cc.textUtils.isUnicodeSpace(character)) {
+        if (cc["textUtils"].isUnicodeCJK(character)
+            || cc["textUtils"].isUnicodeSpace(character)) {
             return 1;
         }
 
         let len = 1;
         for (let index = startIndex + 1; index < textLen; ++index) {
             character = text.charAt(index);
-            if (cc.textUtils.isUnicodeSpace(character)
-                || cc.textUtils.isUnicodeCJK(character)) {
+            if (cc["textUtils"].isUnicodeSpace(character)
+                || cc["textUtils"].isUnicodeCJK(character)) {
                 break;
             }
             len++;
@@ -772,7 +775,7 @@ export default class TmpRichText extends cc.Component {
             if (sprite) {
                 // adjust img align (from <img align=top|center|bottom>)
                 let lineHeightSet = this.lineHeight;
-                let lineHeightReal = this.lineHeight * (1 + cc.textUtils.BASELINE_RATIO); //single line node height
+                let lineHeightReal = this.lineHeight * (1 + cc["textUtils"].BASELINE_RATIO); //single line node height
                 switch (label.anchorY) {
                     case 1:
                         label.y += (lineHeightSet + ((lineHeightReal - lineHeightSet) / 2));
