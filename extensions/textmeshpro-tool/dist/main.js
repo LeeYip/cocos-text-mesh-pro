@@ -11,10 +11,10 @@ const { dialog } = require("electron");
 const os = require("os");
 const fs = require("fs");
 const exec = require("child_process").exec;
-const EXAMPLE_PATH = "/extensions/textmeshpro-tool/textMeshPro";
-const CONFIG_PATH = "/extensions/textmeshpro-tool/dist/config.json";
-const TEMP_PATH = "/extensions/textmeshpro-tool/dist/temp";
-const TEMP_HIERO_PATH = "/extensions/textmeshpro-tool/dist/temp/hieroConfig.hiero";
+const EXAMPLE_PATH = `${__dirname}/../textMeshPro`;
+const CONFIG_PATH = `${__dirname}/config.json`;
+const TEMP_PATH = `${__dirname}/temp`;
+const TEMP_HIERO_PATH = `${__dirname}/temp/hieroConfig.hiero`;
 let config = {
     hieroPath: "",
     fontPath: "",
@@ -39,11 +39,11 @@ function isFileExist(path) {
 }
 async function readConfig() {
     try {
-        let exist = await isFileExist(Editor.Project.path + CONFIG_PATH);
+        let exist = await isFileExist(CONFIG_PATH);
         if (!exist) {
             return;
         }
-        let data = fs.readFileSync(Editor.Project.path + CONFIG_PATH, "utf-8");
+        let data = fs.readFileSync(CONFIG_PATH, "utf-8");
         if (data) {
             config = JSON.parse(data);
         }
@@ -55,8 +55,8 @@ async function readConfig() {
 function writeConfig() {
     try {
         let data = JSON.stringify(config);
-        fs.writeFileSync(Editor.Project.path + CONFIG_PATH, data);
-        console.log(`write config: ${Editor.Project.path + CONFIG_PATH}`);
+        fs.writeFileSync(CONFIG_PATH, data);
+        console.log(`write config: ${CONFIG_PATH}`);
     }
     catch (err) {
         console.error(`[textmeshpro-tool writeConfig] error`);
@@ -65,12 +65,12 @@ function writeConfig() {
 }
 function exportFont() {
     try {
-        let check = fs.existsSync(`${Editor.Project.path}${TEMP_PATH}`);
+        let check = fs.existsSync(`${TEMP_PATH}`);
         if (!check) {
-            fs.mkdirSync(`${Editor.Project.path}${TEMP_PATH}`);
+            fs.mkdirSync(`${TEMP_PATH}`);
         }
-        utils_1.default.writeHiero(`${Editor.Project.path}${TEMP_HIERO_PATH}`, config);
-        let cmdStr = `java -jar ${config.hieroPath} -i ${Editor.Project.path}${TEMP_HIERO_PATH} -o ${config.exportDir}/${config.exportName}.fnt -b`;
+        utils_1.default.writeHiero(TEMP_HIERO_PATH, config);
+        let cmdStr = `java -jar ${config.hieroPath} -i ${TEMP_HIERO_PATH} -o ${config.exportDir}/${config.exportName}.fnt -b`;
         console.log("[textmeshpro-tool] 正在输出字体文件，请耐心等待Hiero窗口自行关闭...");
         let time = Date.now();
         exec(cmdStr, (err, stdout, stderr) => {
@@ -111,10 +111,10 @@ exports.methods = {
             }
             let cmdStr = "";
             if (os.type() == "Windows_NT") {
-                cmdStr = `xcopy ${Editor.Project.path}${EXAMPLE_PATH.replace(/\//g, "\\")} ${Editor.Project.path}\\assets\\textMeshPro\\ /e`;
+                cmdStr = `xcopy ${EXAMPLE_PATH.replace(/\//g, "\\")} ${Editor.Project.path}\\assets\\textMeshPro\\ /e`;
             }
             else {
-                cmdStr = `cp -r ${Editor.Project.path}${EXAMPLE_PATH} ${Editor.Project.path}/assets/textMeshPro/`;
+                cmdStr = `cp -r ${EXAMPLE_PATH} ${Editor.Project.path}/assets/textMeshPro/`;
             }
             console.log(cmdStr);
             exec(cmdStr, (error, stdout, stderr) => {
