@@ -108,7 +108,8 @@ export default class TmpUtils {
     }
 
     public static getEnglishWordPartAtFirst(stringToken: string) {
-        const result = FIRST_ENGLISH_REG.exec(stringToken);
+        // const result = FIRST_ENGLISH_REG.exec(stringToken);
+        const result = WORD_REG.exec(stringToken);
         return result;
     }
 

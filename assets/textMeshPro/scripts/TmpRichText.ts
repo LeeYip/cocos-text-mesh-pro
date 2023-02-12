@@ -379,7 +379,14 @@ export default class TmpRichText extends Component {
                 if (thisPartSize.x < 2048) {
                     partStringArr.push(multilineTexts[i]);
                 } else {
-                    const thisPartSplitResultArr = this.splitLongStringOver2048(multilineTexts[i], styleIndex);
+                    // const thisPartSplitResultArr = this.splitLongStringOver2048(multilineTexts[i], styleIndex);
+                    // If it is not the first element, it is right behind a "\n", so we should reset the lineOffsetX as 0.
+                    let currOffsetX = i === 0 ? this._lineOffsetX : 0;
+                    // Hack: Special switching line could reserve fontSize-length space
+                    if (currOffsetX >= this.maxWidth - this.fontSize) {
+                        currOffsetX = 0;
+                    }
+                    const thisPartSplitResultArr = this.splitLongStringOver2048(multilineTexts[i], styleIndex, currOffsetX);
                     partStringArr.push(...thisPartSplitResultArr);
                 }
             }
@@ -390,7 +397,7 @@ export default class TmpRichText extends Component {
     /**
     * @engineInternal
     */
-    protected splitLongStringOver2048(text: string, styleIndex: number) {
+    protected splitLongStringOver2048(text: string, styleIndex: number, lineOffsetX) {
         const partStringArr: string[] = [];
         const longStr = text;
 
@@ -398,15 +405,22 @@ export default class TmpRichText extends Component {
         let curEnd = longStr.length / 2;
         let curString = longStr.substring(curStart, curEnd);
         let leftString = longStr.substring(curEnd);
-        let curStringSize = this._calculateSize(styleIndex, curString);
-        let leftStringSize = this._calculateSize(styleIndex, leftString);
+        // let curStringSize = this._calculateSize(styleIndex, curString);
+        // let leftStringSize = this._calculateSize(styleIndex, leftString);
+        let curStringSizeX = this._calculateSize(styleIndex, curString).x;
 
         // a line should be an unit to split long string
         const lineCountForOnePart = 1;
-        const sizeForOnePart = lineCountForOnePart * this.maxWidth;
+        // const sizeForOnePart = lineCountForOnePart * this.maxWidth;
+        let sizeForThisPart = (lineCountForOnePart * this.maxWidth === 0 || lineCountForOnePart * this.maxWidth > 2048) ? 2048 : (lineCountForOnePart * this.maxWidth);
+
+        // it does influence the first element of splitted array,
+        // the element should put into the left space in current line
+        sizeForThisPart -= lineOffsetX;
 
         // divide text into some pieces of which the size is less than sizeForOnePart
-        while (curStringSize.x > sizeForOnePart) {
+        // while (curStringSize.x > sizeForOnePart) {
+        while (curStringSizeX > sizeForThisPart) {
             curEnd /= 2;
             // at least one char can be an entity, step back.
             if (curEnd < 1) {
@@ -416,7 +430,8 @@ export default class TmpRichText extends Component {
 
             curString = curString.substring(curStart, curEnd);
             leftString = longStr.substring(curEnd);
-            curStringSize = this._calculateSize(styleIndex, curString);
+            // curStringSize = this._calculateSize(styleIndex, curString);
+            curStringSizeX = this._calculateSize(styleIndex, curString).x;
         }
 
         // avoid too many loops
@@ -424,7 +439,13 @@ export default class TmpRichText extends Component {
         // the minimum step of expansion or reduction
         let curWordStep = 1;
         while (leftTryTimes && curStart < text.length) {
-            while (leftTryTimes && curStringSize.x < sizeForOnePart) {
+            // while (leftTryTimes && curStringSize.x < sizeForOnePart) {
+            while (leftTryTimes && curStringSizeX < sizeForThisPart) {
+                // if all the characters are consumed, the size cannot reach sizeForThisPart, we should break the loop
+                if (!leftString) {
+                    break;
+                }
+
                 const nextPartExec = TmpUtils.getEnglishWordPartAtFirst(leftString);
                 // add a character, unless there is a complete word at the beginning of the next line
                 if (nextPartExec && nextPartExec.length > 0) {
@@ -434,56 +455,83 @@ export default class TmpRichText extends Component {
 
                 curString = longStr.substring(curStart, curEnd);
                 leftString = longStr.substring(curEnd);
-                curStringSize = this._calculateSize(styleIndex, curString);
+                // curStringSize = this._calculateSize(styleIndex, curString);
+                curStringSizeX = this._calculateSize(styleIndex, curString).x;
 
                 leftTryTimes--;
             }
 
             // reduce condition：size > maxwidth && curString.length >= 2
-            while (leftTryTimes && curString.length >= 2 && curStringSize.x > sizeForOnePart) {
+            // while (leftTryTimes && curString.length >= 2 && curStringSize.x > sizeForOnePart) {
+            while (leftTryTimes && curString.length >= 2 && curStringSizeX > sizeForThisPart) {
                 curEnd -= curWordStep;
+                //     curString = longStr.substring(curStart, curEnd);
+                //     curStringSize = this._calculateSize(styleIndex, curString);
+                //     // after the first reduction, the step should be 1.
+                //     curWordStep = 1;
+
+                //     leftTryTimes--;
+                // }
+
+                // // consider there is a part of a word at the end of this line, it should be moved to the next line
+                // if (curString.length >= 2) {
+                const lastWordExec = TmpUtils.getEnglishWordPartAtLast(curString);
+                //     if (lastWordExec && lastWordExec.length > 0
+                //         // to avoid endless loop when there is only one word in this line
+                //         && curString !== lastWordExec[0]) {
+                //         curEnd -= lastWordExec[0].length;
+                //         curString = longStr.substring(curStart, curEnd);
+                if (lastWordExec && lastWordExec.length > 0) {
+                    curWordStep = lastWordExec[0].length;
+                }
+
                 curString = longStr.substring(curStart, curEnd);
-                curStringSize = this._calculateSize(styleIndex, curString);
-                // after the first reduction, the step should be 1.
-                curWordStep = 1;
+                curStringSizeX = this._calculateSize(styleIndex, curString).x;
+                // // after the first reduction, the step should be 1.
+                // curWordStep = 1;
 
                 leftTryTimes--;
-            }
-
-            // consider there is a part of a word at the end of this line, it should be moved to the next line
-            if (curString.length >= 2) {
-                const lastWordExec = TmpUtils.getEnglishWordPartAtLast(curString);
-                if (lastWordExec && lastWordExec.length > 0
-                    // to avoid endless loop when there is only one word in this line
-                    && curString !== lastWordExec[0]) {
-                    curEnd -= lastWordExec[0].length;
-                    curString = longStr.substring(curStart, curEnd);
-                }
             }
 
             // curStart and curEnd can be float since they are like positions of pointer,
             // but step must be integer because we split the complete characters of which the unit is integer.
             // it is reasonable that using the length of this result to estimate the next result.
             partStringArr.push(curString);
-            const partStep = curString.length;
+            // const partStep = curString.length;
+            // after putting the first element in array, we should reset sizeForThisPart
+            sizeForThisPart = (lineCountForOnePart * this.maxWidth === 0 || lineCountForOnePart * this.maxWidth > 2048)
+                ? 2048 : (lineCountForOnePart * this.maxWidth);
+
+            // estimate the next element length
+            // precise calculation is in the next loop
+            const nextStep = sizeForThisPart / this.fontSize;
             curStart = curEnd;
-            curEnd += partStep;
+            // curEnd += partStep;
+            curEnd += nextStep;
 
             curString = longStr.substring(curStart, curEnd);
+            curStringSizeX = this._calculateSize(styleIndex, curString).x;
             leftString = longStr.substring(curEnd);
-            leftStringSize = this._calculateSize(styleIndex, leftString);
+            // leftStringSize = this._calculateSize(styleIndex, leftString);
 
             leftTryTimes--;
 
             // Exit: If the left part string size is less than 2048, the method will finish.
-            if (leftStringSize.x < 2048) {
+            // if (leftStringSize.x < 2048) {
+            // Exit1: If the current string is the last part of text and its size is less than 2048,
+            // the leftString will be empty string, then we should exit
+            if (!leftString
+                && curStringSizeX < 2048) {
                 curStart = text.length;
                 curEnd = text.length;
-                curString = leftString;
-                partStringArr.push(curString);
+                // curString = leftString;
+                // partStringArr.push(curString);
+                if (curString) {
+                    partStringArr.push(curString);
+                }
                 break;
-            } else {
-                curStringSize = this._calculateSize(styleIndex, curString);
+                // } else {
+                //     curStringSize = this._calculateSize(styleIndex, curString);
             }
         }
 
