@@ -258,6 +258,9 @@ export class TmpUniform {
     public init(text: TextMeshPro) {
         this._comp = text;
 
+        if (CC_EDITOR) {
+            return;
+        }
         let material = this._comp.getMaterial(0);
         this._comp.updateTmpMatFace(material);
         this._comp.updateTmpMatOutline(material);
@@ -727,7 +730,7 @@ export default class TextMeshPro extends cc.RenderComponent {
      */
     public setFont(font: cc.JsonAsset, textures: cc.Texture2D[]): void {
         if (!font || textures.length < 0) {
-            cc.error(`params error!`);
+            cc.error(`please check your font!`);
             return;
         }
 
