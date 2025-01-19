@@ -1,4 +1,4 @@
-import { BaseRenderData, color, Color, Enum, error, gfx, HorizontalTextAlignment, JsonAsset, Material, RenderData, renderer, SpriteFrame, StencilManager, Texture2D, UIRenderer, Vec2, Vec3, VerticalTextAlignment, _decorator } from "cc";
+import { _decorator, BaseRenderData, color, Color, Enum, error, gfx, HorizontalTextAlignment, JsonAsset, Material, RenderData, renderer, SpriteFrame, StencilManager, Texture2D, UIRenderer, Vec2, Vec3, VerticalTextAlignment } from "cc";
 import { EDITOR, JSB } from "cc/env";
 import TmpAssembler, { TmpLetterInfo } from "./utils/TmpAssembler";
 import TmpFontConfig from "./utils/TmpFontConfig";
@@ -555,7 +555,7 @@ export default class TextMeshPro extends UIRenderer {
                 });
                 Promise.all(arr).then((v) => {
                     this.textures = v;
-                    this._fontConfig = new TmpFontConfig(this._font.json, this.textures);
+                    this._fontConfig = TmpFontConfig.getFontConfig(this._font, this.textures);
 
                     if (this._renderData) {
                         this.destroyRenderData();
@@ -584,7 +584,7 @@ export default class TextMeshPro extends UIRenderer {
         }
         this.tmpUniform.init(this);
         if (!this._fontConfig && this.font && this.textures.length > 0) {
-            this._fontConfig = new TmpFontConfig(this._font.json, this.textures);
+            this._fontConfig = TmpFontConfig.getFontConfig(this._font, this.textures);
         }
     }
 
@@ -884,7 +884,7 @@ export default class TextMeshPro extends UIRenderer {
 
         this._font = font;
         this.textures = textures;
-        this._fontConfig = new TmpFontConfig(this._font.json, this.textures);
+        this._fontConfig = TmpFontConfig.getFontConfig(this._font, this.textures);
         if (!this.enabledInHierarchy) { return; }
         this.updateRenderData(true);
     }

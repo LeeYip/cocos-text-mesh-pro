@@ -1,4 +1,4 @@
-import { js, Texture2D } from "cc";
+import { js, JsonAsset, Texture2D } from "cc";
 
 /**
  * 字体配置JSON
@@ -43,18 +43,28 @@ export class TmpFontLetter {
  * BitmapFont配置管理类
  */
 export default class TmpFontConfig {
+    public static cache: Map<JsonAsset, TmpFontConfig> = new Map();
+    public static getFontConfig(font: JsonAsset, textures: Texture2D[]): TmpFontConfig {
+        let fontConfig = this.cache.get(font);
+        if (!fontConfig) {
+            fontConfig = new TmpFontConfig(font, textures);
+            this.cache.set(font, fontConfig);
+        }
+        return fontConfig;
+    }
+
     private _letterDefinitions: { [id: number]: TmpFontLetter } = {};
     private _textures: { [id: number]: Texture2D } = {};
     private _json: TmpFontJson = null;
     public get json(): TmpFontJson { return this._json; }
 
-    public constructor(json: any, textures: Texture2D[]) {
-        this._json = json;
+    public constructor(font: JsonAsset, textures: Texture2D[]) {
+        this._json = font.json as TmpFontJson;
         textures.forEach((v, id) => {
             this._textures[id] = v;
         });
 
-        json.charData.forEach((v) => {
+        this._json.charData.forEach((v) => {
             let letter = new TmpFontLetter();
 
             letter.offsetX = v.xoffset;
