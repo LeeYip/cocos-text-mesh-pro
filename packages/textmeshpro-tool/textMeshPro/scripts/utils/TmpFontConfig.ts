@@ -18,7 +18,7 @@ export interface TmpFontJson {
     redChnl: number;
     greenChnl: number;
     blueChnl: number;
-    pageData: Array<{ id: number, file: string }>;
+    pageData: Array<{ id: number; file: string }>;
     charData: Array<any>;
 }
 
@@ -41,18 +41,30 @@ export class TmpFontLetter {
  * BitmapFont配置管理类
  */
 export default class TmpFontConfig {
+    public static cache: Map<cc.JsonAsset, TmpFontConfig> = new Map();
+    public static getFontConfig(font: cc.JsonAsset, textures: cc.Texture2D[]): TmpFontConfig {
+        let fontConfig = this.cache.get(font);
+        if (!fontConfig) {
+            fontConfig = new TmpFontConfig(font, textures);
+            this.cache.set(font, fontConfig);
+        }
+        return fontConfig;
+    }
+
     private _letterDefinitions: { [id: number]: TmpFontLetter } = {};
     private _textures: { [id: number]: cc.Texture2D } = {};
     private _json: TmpFontJson = null;
-    public get json(): TmpFontJson { return this._json; }
+    public get json(): TmpFontJson {
+        return this._json;
+    }
 
-    public constructor(json: any, textures: cc.Texture2D[]) {
-        this._json = json;
+    public constructor(font: cc.JsonAsset, textures: cc.Texture2D[]) {
+        this._json = font.json;
         textures.forEach((v, id) => {
             this._textures[id] = v;
         });
 
-        json.charData.forEach((v) => {
+        this._json.charData.forEach((v) => {
             let letter = new TmpFontLetter();
 
             letter.offsetX = v.xoffset;

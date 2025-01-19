@@ -273,7 +273,6 @@ export class TmpUniform {
 @executeInEditMode
 @menu("TextMeshPro组件/TextMeshPro")
 export default class TextMeshPro extends cc.RenderComponent {
-
     @property
     private _string: string = "";
     @property({ multiline: true })
@@ -525,13 +524,12 @@ export default class TextMeshPro extends cc.RenderComponent {
                 });
                 Promise.all(arr).then((v) => {
                     this.textures = v;
-                    this._fontConfig = new TmpFontConfig(this._font.json, this.textures);
+                    this._fontConfig = TmpFontConfig.getFontConfig(this._font, this.textures);
 
                     if (!this.enabledInHierarchy) { return; }
                     this.forceUpdateRenderData();
                     this._onBMFontTextureLoaded();
                 });
-
             });
         }
     }
@@ -550,7 +548,7 @@ export default class TextMeshPro extends cc.RenderComponent {
         this.editorInit();
         this.tmpUniform.init(this);
         if (!this._fontConfig && this.font && this.textures.length > 0) {
-            this._fontConfig = new TmpFontConfig(this._font.json, this.textures);
+            this._fontConfig = TmpFontConfig.getFontConfig(this._font, this.textures);
         }
     }
 
@@ -736,7 +734,7 @@ export default class TextMeshPro extends cc.RenderComponent {
 
         this._font = font;
         this.textures = textures;
-        this._fontConfig = new TmpFontConfig(this._font.json, this.textures);
+        this._fontConfig = TmpFontConfig.getFontConfig(this._font, this.textures);
         if (!this.enabledInHierarchy) { return; }
         this.forceUpdateRenderData();
         this._onBMFontTextureLoaded();
